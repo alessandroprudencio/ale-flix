@@ -29,6 +29,7 @@ COPY package.json yarn.lock ./
 # Instala dependências incluindo as de desenvolvimento
 RUN yarn install
 
+RUN yarn prisma generate
 # Copia todo o código para dentro do container
 COPY . .
 

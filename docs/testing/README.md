@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-O StreamFlow implementa uma estratégia abrangente de testes, cobrindo diferentes níveis e aspectos da aplicação.
+O AleFlix implementa uma estratégia abrangente de testes, cobrindo diferentes níveis e aspectos da aplicação.
 
 ## Estratégia de Testes
 

@@ -15,8 +15,8 @@ async function bootstrap() {
 
   // Configuração do Swagger
   const config = new DocumentBuilder()
-    .setTitle('StreamFlow API')
-    .setDescription('API da plataforma de streaming StreamFlow')
+    .setTitle('AleFlix API')
+    .setDescription('API da plataforma de streaming AleFlix')
     .setVersion('1.0')
     .addTag('auth', 'Endpoints de autenticação')
     .addTag('users', 'Endpoints de usuários')

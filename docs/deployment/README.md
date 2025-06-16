@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-O StreamFlow utiliza uma infraestrutura serverless na AWS, com CI/CD automatizado via GitHub Actions.
+O AleFlix utiliza uma infraestrutura serverless na AWS, com CI/CD automatizado via GitHub Actions.
 
 ## Infraestrutura
 
@@ -83,8 +83,8 @@ export class StreamFlowStack extends cdk.Stack {
 
     // API Gateway
     const api = new apigateway.RestApi(this, "StreamFlowAPI", {
-      restApiName: "StreamFlow API",
-      description: "API for StreamFlow platform",
+      restApiName: "AleFlix API",
+      description: "API for AleFlix platform",
     });
 
     // Lambda Functions
@@ -193,7 +193,7 @@ npm run cdk deploy -- --profile prod
 ```typescript
 // Exemplo de métricas personalizadas
 const metric = new cloudwatch.Metric({
-  namespace: "StreamFlow",
+  namespace: "AleFlix",
   metricName: "VideoProcessingTime",
   dimensionsMap: {
     Environment: process.env.NODE_ENV,

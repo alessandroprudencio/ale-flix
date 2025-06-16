@@ -1,8 +1,8 @@
-# Arquitetura do StreamFlow
+# Arquitetura do AleFlix
 
 ## Visão Geral
 
-O StreamFlow é uma plataforma de streaming construída com uma arquitetura distribuída e serverless, focada em escalabilidade, resiliência e observabilidade.
+O AleFlix é uma plataforma de streaming construída com uma arquitetura distribuída e serverless, focada em escalabilidade, resiliência e observabilidade.
 
 ## Diagrama de Arquitetura
 

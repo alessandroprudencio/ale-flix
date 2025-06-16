@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-O StreamFlow utiliza PostgreSQL como banco de dados principal, com suporte a migrações e versionamento de schema.
+O AleFlix utiliza PostgreSQL como banco de dados principal, com suporte a migrações e versionamento de schema.
 
 ## Diagrama ERD
 

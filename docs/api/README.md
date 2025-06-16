@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-A API do StreamFlow é construída com NestJS e Fastify, seguindo os princípios RESTful e utilizando OpenAPI para documentação.
+A API do AleFlix é construída com NestJS e Fastify, seguindo os princípios RESTful e utilizando OpenAPI para documentação.
 
 ## Autenticação
 
