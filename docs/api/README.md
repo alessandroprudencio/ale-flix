@@ -238,7 +238,7 @@ A API implementa rate limiting para proteger contra abusos:
 
 ```typescript
 // Conexão
-//api.streamflow.com/ws
+//api.aleflix.com/ws
 
 // Eventos disponíveis
 ws: interface Events {
@@ -259,12 +259,12 @@ ws: interface Events {
 
 ```bash
 # Login
-curl -X POST http://api.streamflow.com/auth/login \
+curl -X POST http://api.aleflix.com/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "password123"}'
 
 # Usar token
-curl http://api.streamflow.com/users/me \
+curl http://api.aleflix.com/users/me \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -272,6 +272,6 @@ curl http://api.streamflow.com/users/me \
 
 ```bash
 # Obter URL de streaming
-curl http://api.streamflow.com/media/123/stream \
+curl http://api.aleflix.com/media/123/stream \
   -H "Authorization: Bearer <token>"
 ```

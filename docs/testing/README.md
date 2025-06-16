@@ -86,7 +86,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get("http://api.streamflow.com/media");
+  const res = http.get("http://api.aleflix.com/media");
 
   check(res, {
     "status is 200": (r) => r.status === 200,
@@ -192,7 +192,7 @@ docker run -v $(pwd):/zap/wrk/:rw \
 
 ```yaml
 sonar:
-  properties: sonar.projectKey=streamflow
+  properties: sonar.projectKey=aleflix
     sonar.sources=src
     sonar.tests=test
     sonar.javascript.lcov.reportPaths=coverage/lcov.info

@@ -53,12 +53,12 @@ graph TB
 ### Stack Principal
 
 ```typescript
-export class StreamFlowStack extends cdk.Stack {
+export class AleFlixStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
     // VPC
-    const vpc = new ec2.Vpc(this, "StreamFlowVPC", {
+    const vpc = new ec2.Vpc(this, "AleFlixVPC", {
       maxAzs: 2,
     });
 
@@ -82,7 +82,7 @@ export class StreamFlowStack extends cdk.Stack {
     });
 
     // API Gateway
-    const api = new apigateway.RestApi(this, "StreamFlowAPI", {
+    const api = new apigateway.RestApi(this, "AleFlixAPI", {
       restApiName: "AleFlix API",
       description: "API for AleFlix platform",
     });
@@ -165,7 +165,7 @@ jobs:
 # Deploy para ambiente de desenvolvimento
 npm run cdk deploy -- --profile dev
 
-# URL: https://dev.streamflow.com
+# URL: https://dev.aleflix.com
 ```
 
 ### Staging
@@ -174,7 +174,7 @@ npm run cdk deploy -- --profile dev
 # Deploy para ambiente de staging
 npm run cdk deploy -- --profile staging
 
-# URL: https://staging.streamflow.com
+# URL: https://staging.aleflix.com
 ```
 
 ### Produção
@@ -183,7 +183,7 @@ npm run cdk deploy -- --profile staging
 # Deploy para ambiente de produção
 npm run cdk deploy -- --profile prod
 
-# URL: https://streamflow.com
+# URL: https://aleflix.com
 ```
 
 ## Monitoramento
@@ -234,23 +234,23 @@ const processVideo = async (videoId: string) => {
 ```bash
 # Backup automático
 aws rds create-db-snapshot \
-  --db-instance-identifier streamflow-db \
-  --db-snapshot-identifier streamflow-backup-$(date +%Y%m%d)
+  --db-instance-identifier aleflix-db \
+  --db-snapshot-identifier aleflix-backup-$(date +%Y%m%d)
 
 # Restaurar backup
 aws rds restore-db-instance-from-db-snapshot \
-  --db-instance-identifier streamflow-db-restore \
-  --db-snapshot-identifier streamflow-backup-20240315
+  --db-instance-identifier aleflix-db-restore \
+  --db-snapshot-identifier aleflix-backup-20240315
 ```
 
 ### S3
 
 ```bash
 # Backup de assets
-aws s3 sync s3://streamflow-assets s3://streamflow-backup/assets
+aws s3 sync s3://aleflix-assets s3://aleflix-backup/assets
 
 # Restaurar assets
-aws s3 sync s3://streamflow-backup/assets s3://streamflow-assets
+aws s3 sync s3://aleflix-backup/assets s3://aleflix-assets
 ```
 
 ## Segurança
@@ -276,12 +276,12 @@ lambdaRole.addToPolicy(
 
 ```typescript
 // Configuração do WAF
-const waf = new wafv2.CfnWebACL(this, "StreamFlowWAF", {
+const waf = new wafv2.CfnWebACL(this, "AleFlixWAF", {
   defaultAction: { allow: {} },
   scope: "REGIONAL",
   visibilityConfig: {
     cloudWatchMetricsEnabled: true,
-    metricName: "StreamFlowWAF",
+    metricName: "AleFlixWAF",
     sampledRequestsEnabled: true,
   },
   rules: [

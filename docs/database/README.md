@@ -222,10 +222,10 @@ export class MediaCacheService {
 
 ```bash
 # Restaurar backup
-pg_restore -d streamflow backup.dump
+pg_restore -d aleflix backup.dump
 
 # Verificar integridade
-pg_verify_checksums -d streamflow
+pg_verify_checksums -d aleflix
 ```
 
 ## Monitoramento

@@ -30,7 +30,7 @@ AleFlix é uma plataforma moderna de streaming de filmes que oferece um catálog
 ## Estrutura do Projeto
 
 ```
-streamflow/
+aleflix/
 ├── apps/
 │   ├── api/                 # Backend NestJS
 │   ├── web/                 # Frontend Next.js
