@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  ale-flix-db:
+    image: postgres:16-alpine
+    container_name: ale-flix-db
+    environment:
+      POSTGRES_USER: streamflow
+      POSTGRES_PASSWORD: streamflow
+      POSTGRES_DB: streamflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ale-flix-network
+
+  ale-flix-localstack:
+    image: localstack/localstack:latest
+    container_name: ale-flix-localstack
+    environment:
+      - SERVICES=lambda,s3,cloudwatch,logs,apigateway,dynamodb
+      - EDGE_PORT=4566
+      - DEFAULT_REGION=us-east-1
+    ports:
+      - "4566:4566"
+    volumes:
+      - "./.localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  ale-flix-web:
+    platform: linux/amd64
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: ale-flix-web
+    ports:
+      - "8081:3000"
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    networks:
+      - ale-flix-network
+    command: yarn dev
+
+  ale-flix-api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: ale-flix-api
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./apps/api:/app
+      - /app/node_modules
+    environment:
+      - DATABASE_URL=postgresql://streamflow:streamflow@ale-flix-db:5432/streamflow
+      - JWT_SECRET=your-secret-key
+      - NODE_ENV=development
+    depends_on:
+      - ale-flix-db
+    networks:
+      - ale-flix-network
+    command: yarn start:dev
+
+networks:
+  ale-flix-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
