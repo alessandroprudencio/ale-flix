@@ -44,7 +44,7 @@ responses:
               $ref: "#/components/schemas/User"
 ```
 
-#### POST /auth/register
+#### POST /auth/signup
 
 ```yaml
 requestBody:

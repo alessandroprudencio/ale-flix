@@ -9,12 +9,12 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
-  @Post('register')
+  @Post('signup')
   @ApiOperation({ summary: 'Registrar novo usuário' })
   @ApiResponse({ status: 201, description: 'Usuário registrado com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
-  register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
+  signup(@Body() createUserDto: CreateUserDto) {
+    return this.authService.signup(createUserDto);
   }
 
   @Post('login')

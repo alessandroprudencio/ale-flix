@@ -16,7 +16,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) { }
 
-  async register(dto: CreateUserDto) {
+  async signup(dto: CreateUserDto) {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -53,7 +53,7 @@ export class AuthService {
     });
 
     if (!user || !(await bcrypt.compare(dto.password, user.password))) {
-      throw new UnauthorizedException('Credenciais inválidas.');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const payload = {
@@ -62,10 +62,10 @@ export class AuthService {
       role: user.role,
     };
 
-    const access_token = await this.jwtService.signAsync(payload);
+    const accessToken = await this.jwtService.signAsync(payload);
 
     return {
-      access_token,
+      accessToken,
       user: {
         id: user.id,
         name: user.name,

@@ -13,7 +13,6 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
-  // Configuração do Swagger
   const config = new DocumentBuilder()
     .setTitle('AleFlix API')
     .setDescription('API da plataforma de streaming AleFlix')
@@ -28,7 +27,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  // Configuração de validação global
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -36,7 +34,6 @@ async function bootstrap() {
     }),
   );
 
-  // Configuração de CORS
   app.enableCors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
