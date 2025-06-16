@@ -63,6 +63,7 @@ model Media {
   @@index([releaseYear])
   @@index([type])
   @@index([status])
+  @@map("medias")
 }
 
 model User {
@@ -76,4 +77,5 @@ model User {
   media     Media[]
 
   @@index([email])
+  @@map("users")
 }
