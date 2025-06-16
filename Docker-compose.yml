@@ -5,9 +5,9 @@ services:
     image: postgres:16-alpine
     container_name: ale-flix-db
     environment:
-      POSTGRES_USER: streamflow
-      POSTGRES_PASSWORD: streamflow
-      POSTGRES_DB: streamflow
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ale-flix
     ports:
       - "5432:5432"
     volumes:
@@ -55,10 +55,6 @@ services:
     volumes:
       - ./apps/api:/app
       - /app/node_modules
-    environment:
-      - DATABASE_URL=postgresql://streamflow:streamflow@ale-flix-db:5432/streamflow
-      - JWT_SECRET=your-secret-key
-      - NODE_ENV=development
     depends_on:
       - ale-flix-db
     networks:

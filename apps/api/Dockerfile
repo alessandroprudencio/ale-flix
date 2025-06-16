@@ -29,9 +29,10 @@ COPY package.json yarn.lock ./
 # Instala dependências incluindo as de desenvolvimento
 RUN yarn install
 
-RUN yarn prisma generate
 # Copia todo o código para dentro do container
 COPY . .
+
+RUN npx prisma generate
 
 # Expõe a porta da API
 EXPOSE 4000
