@@ -20,11 +20,12 @@ import { CreateMediaDto } from './dto/create-media.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { MediaRating } from '@prisma/client';
+import { MediaType } from '@prisma/client';
 import { RequestWithUser } from '../auth/types/jwt-payload.interface';
 
 @ApiTags('media')
 @Controller('media')
+@UseGuards(JwtAuthGuard)
 export class MediaController {
   constructor(private readonly mediaService: MediaService) { }
 
@@ -45,38 +46,65 @@ export class MediaController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar catálogo de mídias' })
-  @ApiResponse({ status: 200, description: 'Lista de mídias' })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiQuery({ name: 'genre', required: false, type: String })
-  @ApiQuery({ name: 'year', required: false, type: String })
-  @ApiQuery({ name: 'rating', required: false, enum: MediaRating })
-  @ApiQuery({ name: 'search', required: false, type: String })
-  findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
-    @Query('genre') genre?: string,
-    @Query('year') year?: string,
-    @Query('rating') rating?: string,
-    @Query('search') search?: string,
+  @ApiOperation({ summary: 'List all media' })
+  @ApiResponse({ status: 200, description: 'Return all media' })
+  @ApiQuery({ name: 'type', enum: MediaType, required: false })
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('type') typeStr?: string,
+    @Query('category') category?: string,
   ) {
-    return this.mediaService.findAll({
-      page,
-      limit,
-      genre,
-      year,
-      rating: rating as MediaRating | undefined,
-      search,
-    });
+    const type = typeStr
+      ? MediaType[typeStr.toUpperCase() as keyof typeof MediaType]
+      : undefined;
+    return this.mediaService.findAll({ page, limit, type, category });
+  }
+
+  @Get('search')
+  @ApiOperation({ summary: 'Search media' })
+  @ApiResponse({ status: 200, description: 'Return search results' })
+  async search(
+    @Query('q') query: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.mediaService.search(query, { page, limit });
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Obter detalhes de uma mídia' })
-  @ApiResponse({ status: 200, description: 'Detalhes da mídia' })
-  @ApiResponse({ status: 404, description: 'Mídia não encontrada' })
-  findOne(@Param('id') id: string) {
+  @ApiOperation({ summary: 'Get media by id' })
+  @ApiResponse({ status: 200, description: 'Return media details' })
+  async findOne(@Param('id') id: string) {
     return this.mediaService.findOne(id);
+  }
+
+  @Get('featured')
+  @ApiOperation({ summary: 'Get featured media' })
+  @ApiResponse({ status: 200, description: 'Return featured media' })
+  async getFeatured() {
+    return this.mediaService.getFeatured();
+  }
+
+  @Get('continue-watching')
+  @ApiOperation({ summary: 'Get continue watching media' })
+  @ApiResponse({ status: 200, description: 'Return continue watching media' })
+  getContinueWatching() {
+    return this.mediaService.getContinueWatching();
+  }
+
+  @Get('popular')
+  @ApiOperation({ summary: 'Get popular media' })
+  @ApiResponse({ status: 200, description: 'Return popular media' })
+  async getPopular() {
+    return this.mediaService.getPopular();
+  }
+
+  @Get('new-releases')
+  @ApiOperation({ summary: 'Get new releases' })
+  @ApiResponse({ status: 200, description: 'Return new releases' })
+  async getNewReleases() {
+    return this.mediaService.getNewReleases();
   }
 
   @Get(':id/trailer')
