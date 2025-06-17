@@ -1,7 +1,12 @@
 <template>
-  <div>
+  <div class="min-h-screen bg-[#0d1117]">
     <AppHeader />
-    <slot />
-    <AppFooter />
+    <main class="pt-16">
+      <slot />
+    </main>
   </div>
 </template>
+
+<script setup>
+import AppHeader from '~/components/layout/header.vue'
+</script>
