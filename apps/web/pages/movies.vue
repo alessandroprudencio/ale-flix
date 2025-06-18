@@ -33,9 +33,14 @@
 import { ref, onMounted } from 'vue'
 import api from '~/services/api'
 
+definePageMeta({
+  middleware: 'auth',
+})
+
 const movies = ref([])
 const loading = ref(true)
 const error = ref(null)
+
 
 onMounted(async () => {
   try {

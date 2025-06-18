@@ -20,6 +20,10 @@ import HeroSection from '~/components/media/hero-section.vue'
 import MediaSection from '~/components/media/media-section.vue'
 import type { Media } from '~/types/media'
 
+definePageMeta({
+  middleware: 'auth',
+})
+
 const { getFeaturedMedia, getContinueWatching, getPopularMedia, getNewReleases } = useMedia()
 
 const featuredMedia = ref<Media | null>(null)
