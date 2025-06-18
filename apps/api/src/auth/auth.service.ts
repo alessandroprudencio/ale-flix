@@ -7,6 +7,7 @@ import { LoginDto } from './dto/login.dto'
 import { FastifyRequest } from 'fastify'
 import { FastifyReply } from 'fastify'
 import '@fastify/cookie'
+import { UserRole } from '@prisma/client'
 
 export type FastifyReplyWithCookie = FastifyReply & {
   setCookie: (name: string, value: string, options?: any) => void
@@ -36,7 +37,7 @@ export class AuthService {
         email: dto.email,
         name: dto.name,
         password: hashedPassword,
-        role: 'USER', // ou dto.role se quiser permitir ADMIN no registro
+        role: UserRole.USER,
       },
     })
 

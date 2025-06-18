@@ -37,12 +37,12 @@
 
             <!-- User Menu Dropdown -->
             <div v-if="isUserMenuOpen" class="absolute right-0 mt-2 w-48 bg-[#161b22] rounded-lg shadow-lg py-1">
-              <NuxtLink to="/perfil" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition">
-                Meu Perfil
+              <NuxtLink v-if="authStore.isAdmin" to="/admin" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition">
+                Admin
               </NuxtLink>
-              <NuxtLink to="/favoritos" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition">
+              <!-- <NuxtLink to="/favoritos" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition">
                 Favoritos
-              </NuxtLink>
+              </NuxtLink> -->
               <button class="w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition" @click="handleLogout">
                 Sair
               </button>
@@ -62,22 +62,26 @@ const authStore = useAuthStore()
 const isUserMenuOpen = ref(false)
 
 function toggleUserMenu() {
+  console.log('toggleUserMenu', isUserMenuOpen.value)
   isUserMenuOpen.value = !isUserMenuOpen.value
 }
 
-function handleClickOutside(event) {
-  if (isUserMenuOpen.value && !event.target.closest('.user-menu')) {
-    isUserMenuOpen.value = false
-  }
-}
+// function handleClickOutside(event) {
+//   console.log('handleClickOutside', event.target.closest('.user-menu'))
+//   console.log('isUserMenuOpen', isUserMenuOpen.value)
+//   if (isUserMenuOpen.value && !event.target.closest('.user-menu')) {
+//     console.log('fechando menu')
+//     // isUserMenuOpen.value = false
+//   }
+// }
 
-onMounted(() => {
-  window.addEventListener('click', handleClickOutside)
-})
+// onMounted(() => {
+//   window.addEventListener('click', handleClickOutside)
+// })
 
-onUnmounted(() => {
-  window.removeEventListener('click', handleClickOutside)
-})
+// onUnmounted(() => {
+//   window.removeEventListener('click', handleClickOutside)
+// })
 
 async function handleLogout() {
   await authStore.logout()

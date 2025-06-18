@@ -6,6 +6,7 @@ import api from '~/services/api'
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const isAuthenticated = ref(false)
+  const isAdmin = ref(false)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
@@ -15,6 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await api.login(credentials)
       user.value = response.user
       isAuthenticated.value = true
+      isAdmin.value = response.user.role === 'ADMIN'
       return response
     } catch (err: any) {
       error.value = err.message || 'Failed to login'
@@ -47,6 +49,7 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await api.getUserProfile()
       user.value = response
       isAuthenticated.value = true
+      isAdmin.value = response.role === 'ADMIN'
       return response
     } catch (err) {
       user.value = null
@@ -60,6 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     user,
     isAuthenticated,
+    isAdmin,
     isLoading,
     error,
     login,
