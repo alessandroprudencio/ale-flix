@@ -161,7 +161,8 @@ export class MediaService {
       {
         id: '1',
         title: 'Stranger Things',
-        thumbnailUrl: 'https://example.com/stranger-things.jpg',
+        thumbnailUrl:
+          'https://upload.wikimedia.org/wikipedia/commons/3/38/Stranger_Things_logo.png',
         releaseYear: 2016,
         type: 'SERIES',
         rating: 4.5,

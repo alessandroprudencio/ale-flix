@@ -6,11 +6,18 @@ A API do AleFlix é construída com NestJS e Fastify, seguindo os princípios RE
 
 ## Autenticação
 
-Todas as requisições à API (exceto login e registro) devem incluir o token JWT no header:
+A autenticação é feita via cookies HTTP-only. O token JWT é automaticamente enviado em cada requisição através do cookie `auth_token`.
 
-```
-Authorization: Bearer <token>
-```
+### Login
+
+Ao fazer login, o servidor retorna um cookie HTTP-only com o token JWT. Este cookie é automaticamente enviado em todas as requisições subsequentes.
+
+### Segurança
+
+- Cookies são HTTP-only (não acessíveis via JavaScript)
+- Cookies são seguros em produção (HTTPS apenas)
+- Cookies são configurados com SameSite=Lax para proteção contra CSRF
+- Tokens têm expiração de 24 horas
 
 ## Endpoints
 
@@ -38,10 +45,13 @@ responses:
         schema:
           type: object
           properties:
-            token:
-              type: string
             user:
               $ref: "#/components/schemas/User"
+    headers:
+      Set-Cookie:
+        schema:
+          type: string
+          example: auth_token=xxx; HttpOnly; Path=/; Max-Age=86400; SameSite=Lax
 ```
 
 #### POST /auth/signup
