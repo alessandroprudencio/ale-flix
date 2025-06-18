@@ -1,56 +1,78 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateMediaDto } from './dto/create-media.dto';
-import { Prisma, Media, MediaType } from '@prisma/client';
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { PrismaService } from '../prisma/prisma.service'
+import { CreateMediaDto } from './dto/create-media.dto'
+import { Prisma, Media, MediaType } from '@prisma/client'
 
 @Injectable()
 export class MediaService {
   constructor(private prisma: PrismaService) { }
 
   async create(createMediaDto: CreateMediaDto, userId: string): Promise<Media> {
-    const { releaseYear, genres, ...rest } = createMediaDto;
+    const { categoryIds, ...mediaData } = createMediaDto
 
     return this.prisma.media.create({
       data: {
-        ...rest,
-        releaseYear: Number(releaseYear),
-        userId,
-        rating: 0, // Default rating
+        ...mediaData,
+        user: {
+          connect: { id: userId },
+        },
         categories: {
-          create: genres.map((name) => ({ name })),
+          connect: categoryIds?.map(id => ({ id })) ?? [],
         },
       },
-    });
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    })
   }
 
   async findAll({
-    page,
-    limit,
+    page = 1,
+    limit = 10,
     type,
     category,
   }: {
-    page: number;
-    limit: number;
-    type?: MediaType;
-    category?: string;
+    page: number
+    limit: number
+    type?: MediaType
+    category?: string
   }) {
-    const skip = (page - 1) * limit;
+    const skip = (page - 1) * limit
     const where: Prisma.MediaWhereInput = {
       ...(type && { type }),
-      ...(category && { categories: { some: { name: category } } }),
-    };
+      ...(category && {
+        categories: {
+          some: {
+            category: {
+              name: category,
+            },
+          },
+        },
+      }),
+    }
 
     const [media, total] = await Promise.all([
       this.prisma.media.findMany({
-        where,
         skip,
         take: limit,
+        where,
         include: {
-          categories: true,
+          categories: {
+            include: {
+              category: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
         },
       }),
       this.prisma.media.count({ where }),
-    ]);
+    ])
 
     return {
       data: media,
@@ -60,34 +82,46 @@ export class MediaService {
         limit,
         totalPages: Math.ceil(total / limit),
       },
-    };
+    }
   }
 
-  async search(
-    query: string,
-    { page, limit }: { page: number; limit: number },
-  ) {
-    const skip = (page - 1) * limit;
+  async search(query: string, { page, limit }: { page: number; limit: number }) {
+    const skip = (page - 1) * limit
     const where: Prisma.MediaWhereInput = {
       OR: [
-        { title: { contains: query, mode: Prisma.QueryMode.insensitive } },
         {
-          description: { contains: query, mode: Prisma.QueryMode.insensitive },
+          title: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+        {
+          description: {
+            contains: query,
+            mode: 'insensitive',
+          },
         },
       ],
-    };
+    }
 
     const [media, total] = await Promise.all([
       this.prisma.media.findMany({
-        where,
         skip,
         take: limit,
+        where,
         include: {
-          categories: true,
+          categories: {
+            include: {
+              category: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
         },
       }),
       this.prisma.media.count({ where }),
-    ]);
+    ])
 
     return {
       data: media,
@@ -97,66 +131,69 @@ export class MediaService {
         limit,
         totalPages: Math.ceil(total / limit),
       },
-    };
+    }
   }
 
   async findOne(id: string): Promise<Media> {
     const media = await this.prisma.media.findUnique({
       where: { id },
       include: {
-        categories: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
       },
-    });
+    })
 
     if (!media) {
-      throw new NotFoundException(`Mídia com ID ${id} não encontrada`);
+      throw new NotFoundException(`Mídia com ID ${id} não encontrada`)
     }
 
-    return media;
+    return media
   }
 
   async getTrailerUrl(id: string): Promise<{ url: string }> {
-    await this.findOne(id);
-    return { url: '' }; // Removed trailerUrl as it's not in the schema
+    await this.findOne(id)
+    return { url: '' }
   }
 
   async getStreamUrl(id: string): Promise<{ url: string; expiresAt: Date }> {
-    await this.findOne(id);
-    // Simula uma URL de streaming que expira em 1 hora
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-    return { url: `https://stream.example.com/${id}`, expiresAt }; // Mock URL since streamUrl is not in schema
+    await this.findOne(id)
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000)
+    return { url: `https://stream.example.com/${id}`, expiresAt }
   }
 
   async getGenres(): Promise<string[]> {
-    const media = await this.prisma.media.findMany({
-      select: { categories: true },
-    });
-
-    const genres = new Set<string>();
-    media.forEach((m) => m.categories.forEach((c) => genres.add(c.name)));
-    return Array.from(genres);
+    const categories = await this.prisma.category.findMany({
+      select: { name: true },
+    })
+    return categories.map(c => c.name)
   }
 
-  async getYears(): Promise<number[]> {
+  async getReleaseYears(): Promise<number[]> {
     const media = await this.prisma.media.findMany({
-      select: { releaseYear: true },
-      distinct: ['releaseYear'],
-      orderBy: { releaseYear: 'desc' },
-    });
-    return media.map((m) => m.releaseYear);
+      select: { releaseDate: true },
+      distinct: ['releaseDate'],
+      orderBy: { releaseDate: 'desc' },
+    })
+    return media.map(m => m.releaseDate.getFullYear())
   }
 
-  async getFeatured() {
+  async getFeatured(): Promise<Media | null> {
     return this.prisma.media.findFirst({
       where: { isFeatured: true },
       include: {
-        categories: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
       },
-    });
+    })
   }
 
   getContinueWatching() {
-    // Mock data for now
     return [
       {
         id: '1',
@@ -169,22 +206,25 @@ export class MediaService {
         duration: 3600,
         progress: 1800,
       },
-    ];
+    ]
   }
 
-  async getPopular() {
+  async getPopular(): Promise<Media[]> {
     return this.prisma.media.findMany({
       where: { isPopular: true },
-      take: 10,
       include: {
-        categories: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
       },
-    });
+    })
   }
 
   async getNewReleases() {
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    const oneMonthAgo = new Date()
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
 
     return this.prisma.media.findMany({
       where: {
@@ -192,10 +232,87 @@ export class MediaService {
           gte: oneMonthAgo,
         },
       },
-      take: 10,
       include: {
-        categories: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
       },
-    });
+    })
+  }
+
+  async getSeries() {
+    return this.prisma.media.findMany({
+      where: {
+        type: MediaType.SERIES,
+      },
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    })
+  }
+
+  async getMovies() {
+    return this.prisma.media.findMany({
+      where: {
+        type: MediaType.MOVIE,
+      },
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    })
+  }
+
+  async getCategories() {
+    return this.prisma.category.findMany({
+      include: {
+        _count: {
+          select: {
+            media: true,
+          },
+        },
+      },
+    })
+  }
+
+  async getMediaByCategory(categoryId: string) {
+    return this.prisma.media.findMany({
+      where: {
+        categories: {
+          some: {
+            categoryId,
+          },
+        },
+      },
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    })
+  }
+
+  async getCategoryById(id: string) {
+    return this.prisma.category.findUnique({
+      where: { id },
+      include: {
+        media: {
+          include: {
+            media: true,
+          },
+        },
+      },
+    })
   }
 }

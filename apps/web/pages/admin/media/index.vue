@@ -4,7 +4,7 @@
       <div class="sm:flex-auto">
         <h1 class="text-xl font-semibold text-white">Media</h1>
         <p class="mt-2 text-sm text-gray-300">
-          A list of all media in your database including their title, type, and release year.
+          A list of all media in your database including their title, type, rating (indicative), and average user rating.
         </p>
       </div>
       <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
@@ -31,7 +31,10 @@
                     Release Year
                   </th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">
-                    Duration
+                    Rating
+                  </th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">
+                    User Rating
                   </th>
                   <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                     <span class="sr-only">Actions</span>
@@ -50,7 +53,10 @@
                     {{ media.releaseYear }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-                    {{ media.duration }}
+                    {{ media.rating }}
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+                    {{ media.userRating?.toFixed(1) ?? 'N/A' }}
                   </td>
                   <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                     <NuxtLink :to="`/admin/media/${media.id}/edit`" class="text-indigo-400 hover:text-indigo-300 mr-4">

@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, } from 'vue'
+import { ref, watch } from 'vue'
 import type { Category, CreateMediaDto } from '~/types/media.interface'
 
 const props = defineProps<{
@@ -125,7 +125,6 @@ const form = ref<CreateMediaDto>({
   description: '',
   releaseYear: new Date().getFullYear(),
   type: 'MOVIE',
-  rating: 0,
   duration: 0,
   categories: [],
   thumbnailUrl: '',

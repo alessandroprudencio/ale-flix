@@ -12,6 +12,10 @@
     <div class="mt-8">
       <MediaForm v-if="media" :model-value="media" @submit="handleSubmit" :loading="loading" />
       <div v-else class="text-gray-300">Loading...</div>
+      <div v-if="media" class="mt-6 text-gray-400">
+        <div><b>Classificação indicativa:</b> {{ media.rating }}</div>
+        <div><b>Nota média:</b> {{ media.userRating?.toFixed(1) ?? 'N/A' }}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -37,7 +41,7 @@ const fetchMedia = async () => {
   try {
     loading.value = true
     const response = await api.request(`/media/${route.params.id}`, { method: 'GET' })
-    media.value = response
+    media.value = response.data
   } catch (error) {
     console.error('Error loading media:', error)
     router.push('/admin/media')

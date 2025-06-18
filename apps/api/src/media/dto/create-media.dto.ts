@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger'
 import {
   IsString,
   IsNotEmpty,
@@ -10,8 +10,8 @@ import {
   Max,
   IsOptional,
   MaxLength,
-} from 'class-validator';
-import { MediaType, MediaRating, MediaStatus } from '@prisma/client';
+} from 'class-validator'
+import { MediaType, MediaStatus, MediaRating } from '@prisma/client'
 
 export class CreateMediaDto {
   @ApiProperty({
@@ -21,17 +21,19 @@ export class CreateMediaDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
-  title: string;
+  title: string
 
   @ApiProperty({
     example:
       'A história da família Corleone, uma das mais poderosas famílias do crime organizado nos Estados Unidos.',
     description: 'Descrição da mídia',
+    required: false,
   })
   @IsString()
   @IsNotEmpty()
   @MaxLength(1000)
-  description: string;
+  @IsOptional()
+  description?: string
 
   @ApiProperty({
     example: 175,
@@ -39,15 +41,17 @@ export class CreateMediaDto {
   })
   @IsNumber()
   @Min(1)
-  duration: number;
+  duration: number
 
   @ApiProperty({
     example: '1972',
     description: 'Ano de lançamento',
   })
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  releaseYear: string;
+  @Min(1900)
+  @Max(new Date().getFullYear())
+  releaseYear: number
 
   @ApiProperty({
     enum: MediaType,
@@ -55,7 +59,7 @@ export class CreateMediaDto {
     description: 'Tipo da mídia',
   })
   @IsEnum(MediaType)
-  type: MediaType;
+  type: MediaType
 
   @ApiProperty({
     enum: MediaRating,
@@ -63,7 +67,7 @@ export class CreateMediaDto {
     description: 'Classificação indicativa',
   })
   @IsEnum(MediaRating)
-  rating: MediaRating;
+  rating: MediaRating
 
   @ApiProperty({
     example: ['Crime', 'Drama'],
@@ -71,7 +75,7 @@ export class CreateMediaDto {
   })
   @IsArray()
   @IsString({ each: true })
-  genres: string[];
+  genres: string[]
 
   @ApiProperty({
     example: ['Francis Ford Coppola'],
@@ -79,7 +83,7 @@ export class CreateMediaDto {
   })
   @IsArray()
   @IsString({ each: true })
-  directors: string[];
+  directors: string[]
 
   @ApiProperty({
     example: ['Marlon Brando', 'Al Pacino'],
@@ -87,7 +91,7 @@ export class CreateMediaDto {
   })
   @IsArray()
   @IsString({ each: true })
-  cast: string[];
+  cast: string[]
 
   @ApiProperty({
     example: 'https://example.com/thumbnail.jpg',
@@ -95,21 +99,21 @@ export class CreateMediaDto {
   })
   @IsUrl()
   @IsNotEmpty()
-  thumbnailUrl: string;
+  thumbnailUrl: string
 
   @ApiProperty({
     example: 'https://example.com/trailer.mp4',
     description: 'URL do trailer',
   })
   @IsUrl()
-  trailerUrl: string;
+  trailerUrl: string
 
   @ApiProperty({
     example: 'https://example.com/stream.mp4',
     description: 'URL do stream',
   })
   @IsUrl()
-  streamUrl: string;
+  streamUrl: string
 
   @ApiProperty({
     enum: MediaStatus,
@@ -118,23 +122,30 @@ export class CreateMediaDto {
   })
   @IsEnum(MediaStatus)
   @IsOptional()
-  status?: MediaStatus;
+  status?: MediaStatus
+
+  // @ApiProperty({
+  //   example: '123e4567-e89b-12d3-a456-426614174000',
+  //   description: 'ID do usuário',
+  // })
+  // @IsString()
+  // @IsNotEmpty()
+  // userId: string
 
   @ApiProperty({
-    example: 9.2,
-    description: 'Avaliação da mídia',
+    example: 'https://example.com/poster.jpg',
+    description: 'URL do poster',
   })
-  @IsNumber()
-  @Min(0)
-  @Max(10)
-  @IsOptional()
-  userRating?: number;
-
-  @ApiProperty({
-    example: '123e4567-e89b-12d3-a456-426614174000',
-    description: 'ID do usuário',
-  })
-  @IsString()
+  @IsUrl()
   @IsNotEmpty()
-  userId: string;
+  poster: string
+
+  @ApiProperty({
+    example: ['123e4567-e89b-12d3-a456-426614174000', 'abc12345-def6-7890-ghij-klmnopqrstuv'],
+    description: 'IDs das categorias associadas à mídia',
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  categoryIds?: string[]
 }
