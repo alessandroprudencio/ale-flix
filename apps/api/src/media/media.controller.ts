@@ -12,7 +12,7 @@ import { RequestWithUser } from '../auth/types/jwt-payload.interface'
 @Controller('media')
 @UseGuards(JwtAuthGuard)
 export class MediaController {
-  constructor(private readonly mediaService: MediaService) { }
+  constructor(private readonly mediaService: MediaService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -22,7 +22,7 @@ export class MediaController {
   @ApiResponse({ status: 201, description: 'Media created successfully' })
   @ApiResponse({ status: 403, description: 'Forbidden - Only admins can create media' })
   async create(@Body() createMediaDto: CreateMediaDto, @Request() req: RequestWithUser) {
-    return this.mediaService.create(createMediaDto, req.user.id)
+    return this.mediaService.create(createMediaDto, req.user.sub)
   }
 
   @Get()

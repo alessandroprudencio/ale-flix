@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
-import { MediaController } from './media.controller';
-import { MediaService } from './media.service';
-import { PrismaModule } from '../prisma/prisma.module';
+import { Module } from '@nestjs/common'
+import { MediaController } from './media.controller'
+import { MediaService } from './media.service'
+import { PrismaModule } from '../prisma/prisma.module'
 
 @Module({
   imports: [PrismaModule],
@@ -9,4 +9,4 @@ import { PrismaModule } from '../prisma/prisma.module';
   providers: [MediaService],
   exports: [MediaService],
 })
-export class MediaModule { }
+export class MediaModule {}
