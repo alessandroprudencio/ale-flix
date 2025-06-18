@@ -16,8 +16,8 @@
         <nav class="hidden md:flex items-center gap-6">
           <NuxtLink to="/" class="text-white hover:text-gray-300 transition">Início</NuxtLink>
           <NuxtLink to="/series" class="text-white hover:text-gray-300 transition">Séries</NuxtLink>
-          <NuxtLink to="/filmes" class="text-white hover:text-gray-300 transition">Filmes</NuxtLink>
-          <NuxtLink to="/categorias" class="text-white hover:text-gray-300 transition">Categorias</NuxtLink>
+          <NuxtLink to="/movies" class="text-white hover:text-gray-300 transition">Filmes</NuxtLink>
+          <NuxtLink to="/categories" class="text-white hover:text-gray-300 transition">Categorias</NuxtLink>
         </nav>
 
         <!-- Search and User Menu -->
