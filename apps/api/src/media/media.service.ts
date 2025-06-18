@@ -5,7 +5,7 @@ import { Prisma, Media, MediaType } from '@prisma/client'
 
 @Injectable()
 export class MediaService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(createMediaDto: CreateMediaDto, userId: string): Promise<Media> {
     const { categoryIds, ...mediaData } = createMediaDto
@@ -13,6 +13,7 @@ export class MediaService {
     return this.prisma.media.create({
       data: {
         ...mediaData,
+        description: mediaData.description ?? null,
         user: {
           connect: { id: userId },
         },
@@ -21,11 +22,7 @@ export class MediaService {
         },
       },
       include: {
-        categories: {
-          include: {
-            category: true,
-          },
-        },
+        categories: true,
       },
     })
   }
@@ -47,9 +44,7 @@ export class MediaService {
       ...(category && {
         categories: {
           some: {
-            category: {
-              name: category,
-            },
+            id: category,
           },
         },
       }),
@@ -61,11 +56,7 @@ export class MediaService {
         take: limit,
         where,
         include: {
-          categories: {
-            include: {
-              category: true,
-            },
-          },
+          categories: true,
         },
         orderBy: {
           createdAt: 'desc',
@@ -110,11 +101,7 @@ export class MediaService {
         take: limit,
         where,
         include: {
-          categories: {
-            include: {
-              category: true,
-            },
-          },
+          categories: true,
         },
         orderBy: {
           createdAt: 'desc',
@@ -138,11 +125,7 @@ export class MediaService {
     const media = await this.prisma.media.findUnique({
       where: { id },
       include: {
-        categories: {
-          include: {
-            category: true,
-          },
-        },
+        categories: true,
       },
     })
 
@@ -184,11 +167,7 @@ export class MediaService {
     return this.prisma.media.findFirst({
       where: { isFeatured: true },
       include: {
-        categories: {
-          include: {
-            category: true,
-          },
-        },
+        categories: true,
       },
     })
   }
@@ -213,11 +192,7 @@ export class MediaService {
     return this.prisma.media.findMany({
       where: { isPopular: true },
       include: {
-        categories: {
-          include: {
-            category: true,
-          },
-        },
+        categories: true,
       },
     })
   }
@@ -233,11 +208,7 @@ export class MediaService {
         },
       },
       include: {
-        categories: {
-          include: {
-            category: true,
-          },
-        },
+        categories: true,
       },
     })
   }
@@ -248,11 +219,7 @@ export class MediaService {
         type: MediaType.SERIES,
       },
       include: {
-        categories: {
-          include: {
-            category: true,
-          },
-        },
+        categories: true,
       },
     })
   }
@@ -263,11 +230,7 @@ export class MediaService {
         type: MediaType.MOVIE,
       },
       include: {
-        categories: {
-          include: {
-            category: true,
-          },
-        },
+        categories: true,
       },
     })
   }
@@ -288,17 +251,11 @@ export class MediaService {
     return this.prisma.media.findMany({
       where: {
         categories: {
-          some: {
-            categoryId,
-          },
+          some: { id: categoryId },
         },
       },
       include: {
-        categories: {
-          include: {
-            category: true,
-          },
-        },
+        categories: true,
       },
     })
   }
@@ -307,11 +264,7 @@ export class MediaService {
     return this.prisma.category.findUnique({
       where: { id },
       include: {
-        media: {
-          include: {
-            media: true,
-          },
-        },
+        media: true,
       },
     })
   }
