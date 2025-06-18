@@ -52,13 +52,13 @@ definePageMeta({
   layout: false,
 })
 
-const { signup } = useAuth();
+const { signup } = useAuthStore();
 
 const newUser = ref({
   name: 'Alessandro',
-  email: 'alessandro@gmail.com',
-  password: '@Hitman789',
-  confirmPassword: '@Hitman789',
+  email: 'admin@example.com',
+  password: '93+~N5!a',
+  confirmPassword: '93+~N5!a',
 })
 const errorMessage = ref('');
 const errorDetails = ref('');

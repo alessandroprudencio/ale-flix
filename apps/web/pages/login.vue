@@ -83,13 +83,13 @@ import RightSection from '~/components/auth/right-aside.vue'
 import Button from '~/components/ui/button.vue'
 import AlertError from '~/components/ui/alert-error.vue'
 
-const { login } = useAuth();
+const { login } = useAuthStore();
 
 const errorMessage = ref('');
 const errorDetails = ref('');
 const loginData = ref({
-  email: 'alessandro@gmail.com',
-  password: '@Hitman789',
+  email: 'admin@example.com',
+  password: '93+~N5!a',
 })
 
 definePageMeta({
@@ -98,7 +98,7 @@ definePageMeta({
 
 async function handleLogin() {
   try {
-    const resp = await login(loginData.value.email, loginData.value.password);
+    const resp = await login(loginData.value);
     console.log("resp", resp);
     navigateTo('/');
   } catch (err) {
