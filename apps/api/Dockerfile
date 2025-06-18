@@ -4,7 +4,7 @@ FROM --platform=linux/amd64 node:20-alpine AS builder
 WORKDIR /app
 
 # Instala o Yarn
-RUN apk add --no-cache python3 make g++ git
+RUN apk add --no-cache python3 make g++ git openssl
 
 # Copia apenas package.json e yarn.lock para instalar dependências
 COPY package.json yarn.lock ./
@@ -21,7 +21,7 @@ FROM --platform=linux/amd64 node:20-alpine
 WORKDIR /app
 
 # Instala o Yarn
-RUN apk add --no-cache python3 make g++ git
+RUN apk add --no-cache python3 make g++ git openssl
 
 # Copia apenas package.json e yarn.lock para instalar dependências
 COPY package.json yarn.lock ./
