@@ -1,5 +1,7 @@
 # Arquitetura do AleFlix
 
+> [Diagrama Arquitetural no Miro](https://drive.google.com/file/d/1n1EI1ALYbC7QeQhSTsSwan5wOXlSah0r/view?usp=sharing)
+
 ## Visão Geral
 
 O AleFlix é uma plataforma de streaming construída com uma arquitetura distribuída e serverless, focada em escalabilidade, resiliência e observabilidade.

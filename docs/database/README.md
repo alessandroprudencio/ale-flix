@@ -195,17 +195,17 @@ export class MediaCacheService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
   async getMedia(id: string): Promise<Media> {
-    const cacheKey = `media:${id}`;
-    const cached = await this.cacheManager.get(cacheKey);
+    const cacheKey = `media:${id}`
+    const cached = await this.cacheManager.get(cacheKey)
 
     if (cached) {
-      return cached;
+      return cached
     }
 
-    const media = await this.mediaRepository.findOne(id);
-    await this.cacheManager.set(cacheKey, media, 3600); // 1 hora
+    const media = await this.mediaRepository.findOne(id)
+    await this.cacheManager.set(cacheKey, media, 3600) // 1 hora
 
-    return media;
+    return media
   }
 }
 ```

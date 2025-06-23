@@ -48,6 +48,10 @@ aleflix/
 - [Testes](./docs/testing/README.md)
 - [Deploy](./docs/deployment/README.md)
 
+## Diagramas Visuais
+
+- [Diagrama Arquitetural (Miro)](https://drive.google.com/file/d/1n1EI1ALYbC7QeQhSTsSwan5wOXlSah0r/view?usp=sharing)
+
 ## Requisitos
 
 - Node.js 18+
