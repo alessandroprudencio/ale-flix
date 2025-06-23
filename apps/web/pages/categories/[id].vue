@@ -23,40 +23,68 @@
             <p class="text-gray-400 text-sm">{{ media.year }}</p>
             <div class="mt-4 flex justify-between items-center">
               <span class="text-yellow-400">{{ media.rating }}/10</span>
-              <button class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors">
-                Assistir
-              </button>
+              <div class="flex gap-2">
+                <button class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors cursor-pointer"
+                  @click="goToPlayer(media.id)">
+                  Assistir
+                </button>
+                <button class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors cursor-pointer"
+                  @click="goToDetails(media.id)">
+                  Mais informações
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <!-- <VideoPlayer v-if="showPlayer" :src="getStreamUrl(currentStreamUrl)" @close="closePlayer" /> -->
     </template>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import api from '~/services/api'
+// import VideoPlayer from '~/components/ui/video-player.vue'
 
 const route = useRoute()
+const router = useRouter()
 const categoria = ref(null)
 const mediaList = ref([])
 const loading = ref(true)
 const error = ref(null)
 
+const showPlayer = ref(false)
+const currentStreamUrl = ref('')
+
+function openPlayer(streamUrl) {
+  currentStreamUrl.value = streamUrl
+  showPlayer.value = true
+}
+
+function getStreamUrl(streamUrl) {
+  if (streamUrl.startsWith('http')) return streamUrl
+  const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000'
+  return `${base}/${streamUrl}`
+}
+
+function goToPlayer(id) {
+  router.push(`/player/${id}`)
+}
+function goToDetails(id) {
+  router.push(`/media/${id}`)
+}
+
 onMounted(async () => {
   try {
     loading.value = true
-    const [categoriaResponse, mediaResponse] = await Promise.all([
-      api.getCategoryById(route.params.id),
-      api.getMediaByCategory(route.params.id)
-    ])
-    categoria.value = categoriaResponse
-    mediaList.value = mediaResponse
+    const cat = await api.getCategoryById(route.params.id)
+    categoria.value = cat
+    const media = await api.getMediaByCategory(route.params.id)
+    mediaList.value = media
   } catch (err) {
-    console.error('Erro ao carregar dados da categoria:', err)
-    error.value = 'Erro ao carregar dados da categoria. Tente novamente mais tarde.'
+    error.value = 'Erro ao carregar categoria ou mídias.'
   } finally {
     loading.value = false
   }

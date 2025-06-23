@@ -18,12 +18,43 @@ export class MediaService {
           connect: { id: userId },
         },
         categories: {
-          connect: categoryIds?.map(id => ({ id })) ?? [],
+          create: categoryIds.map(categoryId => ({
+            category: { connect: { id: categoryId } },
+          })),
         },
       },
       include: {
         categories: true,
       },
+    })
+  }
+
+  async update(
+    id: string,
+    updateMediaDto: CreateMediaDto,
+    userId: string,
+    // s3Key?: string,
+  ): Promise<Media> {
+    const { categoryIds, ...mediaData } = updateMediaDto
+    // Remove categorias antigas e conecta as novas
+    const data = {
+      ...mediaData,
+      description: mediaData.description ?? null,
+      user: { connect: { id: userId } },
+      categories: {
+        set: [],
+        connect: categoryIds?.map((categoryId: string) => ({ id: categoryId })) ?? [],
+      },
+    }
+
+    // if (s3Key) {
+    //   data.streamUrl = s3Key
+    //   data.status = 'PROCESSING'
+    // }
+    return this.prisma.media.update({
+      where: { id },
+      data,
+      include: { categories: true },
     })
   }
 
@@ -121,11 +152,19 @@ export class MediaService {
     }
   }
 
-  async findOne(id: string): Promise<Media> {
+  async findOne(id: string): Promise<any> {
     const media = await this.prisma.media.findUnique({
       where: { id },
       include: {
-        categories: true,
+        categories: {
+          select: {
+            category: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
       },
     })
 
@@ -133,7 +172,12 @@ export class MediaService {
       throw new NotFoundException(`Mídia com ID ${id} não encontrada`)
     }
 
-    return media
+    const categoryIds = media.categories.map(c => c.category.id)
+
+    return {
+      ...media,
+      categoryIds,
+    }
   }
 
   async getTrailerUrl(id: string): Promise<{ url: string }> {

@@ -5,9 +5,17 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { ValidationPipe } from '@nestjs/common'
 import fastifyCookie from '@fastify/cookie'
+import multipart from '@fastify/multipart'
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter())
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter({
+      // bodyLimit: 600 * 1024 * 1024, // 600MB
+    }),
+  )
+
+  await app.register(multipart)
 
   const config = new DocumentBuilder()
     .setTitle('AleFlix API')

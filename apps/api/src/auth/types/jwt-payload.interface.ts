@@ -1,3 +1,4 @@
+// import { FastifyRequest } from 'fastify'
 import { UserRole } from '@prisma/client'
 
 export interface JwtPayload {
@@ -6,6 +7,7 @@ export interface JwtPayload {
   role: UserRole
 }
 
-export interface RequestWithUser extends Request {
-  user: JwtPayload
-}
+// // Interface sem sobrescrever user
+// export interface RequestWithUser extends FastifyRequest {
+//   user?: JwtPayload
+// }

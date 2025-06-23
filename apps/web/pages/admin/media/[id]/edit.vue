@@ -28,6 +28,7 @@ import MediaForm from '~/components/media/media-form.vue'
 import type { Media, CreateMediaDto } from '~/types/media.interface'
 
 definePageMeta({
+  title: 'Media Management',
   layout: 'admin',
   middleware: ['auth']
 })
@@ -41,7 +42,7 @@ const fetchMedia = async () => {
   try {
     loading.value = true
     const response = await api.request(`/media/${route.params.id}`, { method: 'GET' })
-    media.value = response.data
+    media.value = response
   } catch (error) {
     console.error('Error loading media:', error)
     router.push('/admin/media')
@@ -50,7 +51,7 @@ const fetchMedia = async () => {
   }
 }
 
-const handleSubmit = async (formData: CreateMediaDto) => {
+const handleSubmit = async (formData: FormData) => {
   try {
     loading.value = true
     await api.request(`/media/${route.params.id}`, {

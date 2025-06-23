@@ -1,0 +1,106 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MediaType {
+  MOVIE
+  SERIES
+  DOCUMENTARY
+}
+
+enum MediaStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  PROCESSING
+  READY
+  ERROR
+}
+
+enum MediaRating {
+  G
+  PG
+  PG13
+  R
+  NC17
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model Media {
+  id           String          @id @default(cuid())
+  title        String
+  description  String?
+  thumbnailUrl String
+  releaseYear  Int
+  type         MediaType
+  rating       MediaRating
+  duration     Int
+  progress     Int?
+  isFeatured   Boolean         @default(false)
+  isPopular    Boolean         @default(false)
+  releaseDate  DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  userRating   Float?          @default(0)
+  viewCount    Int             @default(0)
+  user         User            @relation(fields: [userId], references: [id])
+  userId       String
+  poster       String
+  categories   MediaCategory[]
+  streamUrl    String?
+  status       MediaStatus     @default(DRAFT)
+
+  @@index([userId])
+  @@index([type])
+  @@index([releaseYear])
+  @@index([isFeatured])
+  @@index([isPopular])
+  @@index([releaseDate])
+  @@map("medias")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Media     Media[]
+
+  @@map("users")
+}
+
+model Category {
+  id          String          @id @default(cuid())
+  name        String          @unique
+  description String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  media       MediaCategory[]
+
+  @@map("categories")
+}
+
+model MediaCategory {
+  id         String   @id @default(cuid())
+  media      Media    @relation(fields: [mediaId], references: [id])
+  mediaId    String
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+  createdAt  DateTime @default(now())
+
+  @@unique([mediaId, categoryId])
+  @@map("media_to_category")
+}

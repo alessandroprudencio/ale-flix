@@ -30,10 +30,7 @@ const router = useRouter()
 
 const handleSubmit = async (formData: CreateMediaDto) => {
   try {
-    await api.request('/media', {
-      method: 'POST',
-      body: formData
-    })
+    await api.createMedia(formData)
     router.push('/admin/media')
   } catch (error) {
     console.error('Error creating media:', error)

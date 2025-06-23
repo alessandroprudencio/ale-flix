@@ -1,4 +1,5 @@
 import type { BodyLogin, AuthResponse, BodySignup } from '~/types/auth.interface'
+import type { CreateMediaDto } from '~/types/media.interface'
 
 export default {
   async request(endpoint: string, options: any = {}): Promise<any> {
@@ -7,9 +8,12 @@ export default {
     const authStore = useAuthStore()
 
     const headers = {
-      'Content-Type': 'application/json',
+      // 'Content-Type': 'application/json',
       ...options.headers,
     }
+
+    console.log('options.headers', options.headers)
+    console.log(headers)
 
     try {
       return await $fetch(`${baseURL}${endpoint}`, {
@@ -79,20 +83,14 @@ export default {
     return this.request(`/media/categories/${categoryId}/media`)
   },
 
-  async createMedia(data: {
-    title: string
-    description?: string
-    thumbnailUrl: string
-    poster: string
-    releaseYear: number
-    type: 'MOVIE' | 'SERIES' | 'DOCUMENTARY'
-    rating: 'G' | 'PG' | 'PG13' | 'R' | 'NC17'
-    duration: number
-    categories: string[]
-  }) {
+  async createMedia(formData: CreateMediaDto) {
+    console.log('dentro do createMedia')
     return this.request('/media', {
       method: 'POST',
-      body: data,
+      body: formData,
+      headers: {
+        
+      }
     })
   },
 }

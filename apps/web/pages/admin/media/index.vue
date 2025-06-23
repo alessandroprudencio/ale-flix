@@ -2,7 +2,7 @@
   <div>
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-xl font-semibold text-white">Media</h1>
+        <!-- <h1 class="text-xl font-semibold text-white">Media</h1> -->
         <p class="mt-2 text-sm text-gray-300">
           A list of all media in your database including their title, type, rating (indicative), and average user rating.
         </p>
@@ -31,6 +31,9 @@
                     Release Year
                   </th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">
+                    Status
+                  </th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">
                     Rating
                   </th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">
@@ -51,6 +54,9 @@
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
                     {{ media.releaseYear }}
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+                    {{ media.status }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
                     {{ media.rating }}
@@ -83,7 +89,8 @@ import type { Media } from '~/types/media.interface'
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['auth']
+  middleware: ['auth'],
+  title: 'Media Management'
 })
 
 const mediaList = ref<Media[]>([])

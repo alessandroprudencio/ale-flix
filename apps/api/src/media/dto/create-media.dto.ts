@@ -12,6 +12,7 @@ import {
   MaxLength,
 } from 'class-validator'
 import { MediaType, MediaStatus, MediaRating } from '@prisma/client'
+import { Transform, Type } from 'class-transformer'
 
 export class CreateMediaDto {
   @ApiProperty({
@@ -39,6 +40,7 @@ export class CreateMediaDto {
     example: 175,
     description: 'Duração em segundos',
   })
+  @Type(() => Number)
   @IsNumber()
   @Min(1)
   duration: number
@@ -47,6 +49,7 @@ export class CreateMediaDto {
     example: '1972',
     description: 'Ano de lançamento',
   })
+  @Type(() => Number)
   @IsNumber()
   @IsNotEmpty()
   @Min(1900)
@@ -69,29 +72,30 @@ export class CreateMediaDto {
   @IsEnum(MediaRating)
   rating: MediaRating
 
-  @ApiProperty({
-    example: ['Crime', 'Drama'],
-    description: 'Gêneros da mídia',
-  })
-  @IsArray()
-  @IsString({ each: true })
-  genres: string[]
+  // @ApiProperty({
+  //   example: ['Crime', 'Drama'],
+  //   description: 'Gêneros da mídia',
+  // })
+  // @IsArray()
+  // @IsString({ each: true })
+  // genres: string[]
 
-  @ApiProperty({
-    example: ['Francis Ford Coppola'],
-    description: 'Diretores da mídia',
-  })
-  @IsArray()
-  @IsString({ each: true })
-  directors: string[]
+  // @ApiProperty({
+  //   example: ['Francis Ford Coppola'],
+  //   description: 'Diretores da mídia',
+  // })
+  // @IsArray()
+  // @IsString({ each: true })
+  // directors: string[]
 
-  @ApiProperty({
-    example: ['Marlon Brando', 'Al Pacino'],
-    description: 'Elenco da mídia',
-  })
-  @IsArray()
-  @IsString({ each: true })
-  cast: string[]
+  // @ApiProperty({
+  //   example: ['Marlon Brando', 'Al Pacino'],
+  //   description: 'Elenco da mídia',
+  // })
+  // @IsArray()
+  // @IsString({ each: true })
+  // @Type(() => String)
+  // cast: string[]
 
   @ApiProperty({
     example: 'https://example.com/thumbnail.jpg',
@@ -101,19 +105,19 @@ export class CreateMediaDto {
   @IsNotEmpty()
   thumbnailUrl: string
 
-  @ApiProperty({
-    example: 'https://example.com/trailer.mp4',
-    description: 'URL do trailer',
-  })
-  @IsUrl()
-  trailerUrl: string
+  // @ApiProperty({
+  //   example: 'https://example.com/trailer.mp4',
+  //   description: 'URL do trailer',
+  // })
+  // @IsUrl()
+  // trailerUrl: string
 
-  @ApiProperty({
-    example: 'https://example.com/stream.mp4',
-    description: 'URL do stream',
-  })
-  @IsUrl()
-  streamUrl: string
+  // @ApiProperty({
+  //   example: 'https://example.com/stream.mp4',
+  //   description: 'URL do stream',
+  // })
+  // @IsUrl()
+  // streamUrl: string
 
   @ApiProperty({
     enum: MediaStatus,
@@ -147,5 +151,7 @@ export class CreateMediaDto {
   @IsArray()
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
+  @Type(() => String)
+  @Transform(({ value }: { value: string }) => (Array.isArray(value) ? value : [value]))
   categoryIds?: string[]
 }

@@ -31,7 +31,8 @@ export interface Media {
   title: string
   description: string
   releaseYear: number
-  type: 'MOVIE' | 'SERIES'
+  status: string,
+  type: 'MOVIE' | 'SERIES' | 'DOCUMENTARY'
   rating: Rating
   userRating: number // nota média de avaliação
   duration: number
@@ -46,13 +47,22 @@ export interface CreateMediaDto {
   title: string
   description: string
   releaseYear: number
-  type: 'MOVIE' | 'SERIES'
+  type?: 'MOVIE' | 'SERIES' | 'DOCUMENTARY'
   duration: number
-  categories: Category[]
+  categoryIds: string[]
   thumbnailUrl: string
-  poster: string
+  poster: string,
+  rating?: Rating
 }
 
 export interface UpdateMediaDto extends Partial<CreateMediaDto> {
   id: string
+}
+
+export interface CategoryObject {
+  id: string
+  name: string
+  description?: string
+  createdAt?: string
+  updatedAt?: string
 } 
