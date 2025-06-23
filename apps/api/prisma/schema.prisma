@@ -18,6 +18,9 @@ enum MediaStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
+  PROCESSING
+  READY
+  ERROR
 }
 
 enum MediaRating {
@@ -54,6 +57,8 @@ model Media {
   userId       String
   poster       String
   categories   MediaCategory[]
+  streamUrl    String?
+  status       MediaStatus     @default(DRAFT)
 
   @@index([userId])
   @@index([type])
