@@ -1,0 +1,21 @@
+# Arquivos de log e sistema
+*.log
+.DS_Store
+
+# Diretórios de dependências e build
+node_modules
+.turbo
+dist
+.output
+.nuxt
+
+# Configurações de IDE
+.idea
+.vscode
+
+# Arquivos de ambiente local (se houver)
+.env*
+!/.env.example
+
+# Dados do localstack
+localstack-data 

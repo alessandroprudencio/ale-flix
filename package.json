@@ -14,10 +14,10 @@
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
-    "turbo": "latest",
-    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
     "prettier": "^3.0.0",
-    "eslint": "^8.0.0"
+    "turbo": "^2.5.4",
+    "typescript": "^5.0.0"
   },
   "packageManager": "yarn@1.22.19",
   "engines": {

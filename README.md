@@ -1,8 +1,19 @@
-# AleFlix - Catálogo de Filmes e Streaming
+# AleFlix - Movie Catalog and Streaming
 
-## Visão Geral
+## About
 
-AleFlix é uma plataforma moderna de streaming de filmes que oferece um catálogo completo de filmes, trailers e streaming de conteúdo. A aplicação é construída com tecnologias modernas e segue as melhores práticas de desenvolvimento.
+AleFlix is a modern movie streaming platform that offers a complete catalog of movies, trailers, and content streaming. The application is built with modern technologies and follows the best development practices.
+
+## Features
+
+- Complete movie catalog
+- Movie trailers
+- Movie streaming
+- Advanced search system
+- Favorites and history
+- Personalized recommendations
+- User profiles
+- Ratings and comments
 
 ## Tecnologias Principais
 
@@ -15,17 +26,6 @@ AleFlix é uma plataforma moderna de streaming de filmes que oferece um catálog
 - **Autenticação**: JWT + OAuth2
 - **Monitoramento**: Prometheus + Grafana
 - **Logs**: ELK Stack
-
-## Funcionalidades Principais
-
-- Catálogo completo de filmes
-- Visualização de trailers
-- Streaming de filmes
-- Sistema de busca avançada
-- Favoritos e histórico
-- Recomendações personalizadas
-- Perfis de usuário
-- Avaliações e comentários
 
 ## Estrutura do Projeto
 

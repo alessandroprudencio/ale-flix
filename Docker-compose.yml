@@ -17,20 +17,25 @@ services:
     image: localstack/localstack:latest
     container_name: ale-flix-localstack
     environment:
-      - SERVICES=lambda,s3,cloudwatch,logs,apigateway,dynamodb
+      - SERVICES=lambda,s3,cloudwatch,logs,apigateway,dynamodb,sqs
       - EDGE_PORT=4566
       - DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=fakeAccessKeyId
+      - AWS_SECRET_ACCESS_KEY=fakeSecretAccessKey
     ports:
       - '4566:4566'
     volumes:
       - './.localstack:/var/lib/localstack'
       - '/var/run/docker.sock:/var/run/docker.sock'
+      - ./localstack-data:/tmp/localstack-s3-storage
+    networks:
+      - ale-flix-network
 
   ale-flix-web:
     platform: linux/amd64
     build:
-      context: ./apps/web
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/web/Dockerfile
     container_name: ale-flix-web
     ports:
       - '8081:3000'
@@ -42,22 +47,25 @@ services:
     networks:
       - ale-flix-network
     command: yarn dev
+    depends_on:
+      - ale-flix-db
 
   ale-flix-api:
+    platform: linux/amd64
     build:
-      context: ./apps/api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/api/Dockerfile
     container_name: ale-flix-api
     ports:
       - '4000:4000'
     volumes:
       - ./apps/api:/app
-      - /app/node_modules
+      # - /app/node_modules
     depends_on:
       - ale-flix-db
     networks:
       - ale-flix-network
-    command: yarn start:dev
+    # command: tail -f /dev/null
 
   ale-flix-jaeger:
     image: jaegertracing/all-in-one:latest
@@ -73,6 +81,42 @@ services:
       - 14268:14268
       - 14269:14269
       - 9411:9411
+    networks:
+      - ale-flix-network
+
+  ale-flix-video-transcoder:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: apps/video-transcoder/Dockerfile
+    # command: yarn start
+    # command: tail -f /dev/null
+    container_name: ale-flix-video-transcoder
+    volumes:
+      - ./apps/video-transcoder:/app
+      # - /app/node_modules
+    env_file:
+      - ./apps/video-transcoder/.env
+    depends_on:
+      - init-localstack-setup
+      - ale-flix-db
+    networks:
+      - ale-flix-network
+
+  init-localstack-setup:
+    image: python:3.11-alpine
+    user: root
+    container_name: ale-flix-init-localstack-setup
+    entrypoint: >
+      /bin/sh -c "
+        apk add --no-cache curl bash py3-pip &&
+        pip install awscli awscli-local &&
+        /project/localstack-setup.sh
+      "
+    volumes:
+      - ./localstack-setup.sh:/project/localstack-setup.sh
+    depends_on:
+      - ale-flix-localstack
     networks:
       - ale-flix-network
 

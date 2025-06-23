@@ -1,45 +1,20 @@
-# Etapa 1 - Build
-FROM --platform=linux/amd64 node:20-alpine AS builder
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Instala o Yarn
-RUN apk add --no-cache python3 make g++ git openssl
+RUN apk add --no-cache openssl
 
-# Copia apenas package.json e yarn.lock para instalar dependências
-COPY package.json yarn.lock ./
+# Copia somente a pasta da API
+COPY apps/api/package.json apps/api/yarn.lock ./
 
-# Instala dependências
+# Instala as dependências locais da API (inclusive @nestjs/cli)
 RUN yarn install
 
-COPY . .
-RUN yarn build
+# Copia o restante da API
+COPY apps/api .
 
-# Etapa 2 - Runtime
-FROM --platform=linux/amd64 node:20-alpine
+# Expõe a porta (caso use)
+EXPOSE 3000
 
-WORKDIR /app
-
-# Instala o Yarn
-RUN apk add --no-cache python3 make g++ git openssl
-
-# Copia apenas package.json e yarn.lock para instalar dependências
-COPY package.json yarn.lock ./
-
-# Instala dependências incluindo as de desenvolvimento
-RUN yarn install
-
-# Copia todo o código para dentro do container
-COPY . .
-
-RUN npx prisma generate
-
-# Expõe a porta da API
-EXPOSE 4000
-
-# Configura variáveis de ambiente para desenvolvimento
-ENV NODE_ENV=development
-ENV PORT=4000
-
-# Comando para rodar em modo dev com hot-reload
-CMD ["yarn", "start:dev"]
+# Inicia
+CMD ["sh", "-c", "npx prisma migrate dev && npx prisma generate && yarn prisma:seed && yarn start:dev"]

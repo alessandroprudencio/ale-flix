@@ -1,43 +1,23 @@
-FROM node:22-bullseye-slim
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Instala Yarn e ferramentas para compilar módulos nativos
-RUN apt-get update && apt-get install -y \
-  python3 \
-  make \
-  g++ \
-  git \
-  rustc \
-  cargo \
-  libc6-dev \
-  libssl-dev \
-  pkg-config \
-  && rm -rf /var/lib/apt/lists/*
-
-
-# Copia os arquivos de dependência primeiro (para cache de build funcionar)
+# Copie apenas os arquivos de dependências para cache eficiente
 COPY package.json yarn.lock ./
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
+COPY apps/video-transcoder/package.json ./apps/video-transcoder/
 
-# Instala dependências
-RUN yarn install --frozen-lockfile
+# Instale as dependências do monorepo
+RUN yarn install
 
-# Recompila módulos nativos (essencial para better-sqlite3)
-RUN npm rebuild better-sqlite3 --build-from-source
+# O código será montado como volume, não precisa copiar nada aqui!
 
-# ⚠️ Opcional — só use isso se você **realmente precisa** do binding específico
-# RUN yarn add @oxc-parser/binding-linux-x64-gnu
+# Defina o diretório de trabalho do app específico
+WORKDIR /app
 
-# Copia o restante do projeto
-COPY . .
-
-# Expõe porta padrão do Nuxt
+# Exponha a porta adequada (ajuste conforme necessário)
 EXPOSE 3000
 
-# Variáveis de ambiente para Nuxt Dev
-ENV NODE_ENV=development
-ENV HOST=0.0.0.0
-ENV PORT=3000
-
-# Comando de inicialização
+# Comando de desenvolvimento (ajuste conforme o app)
 CMD ["yarn", "dev"]

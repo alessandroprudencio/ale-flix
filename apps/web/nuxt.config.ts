@@ -8,6 +8,9 @@ export default defineNuxtConfig({
       apiBase: process.env.API_BASE_URL || 'http://localhost:4000',
     },
   },
+  plugins: [
+    { src: '~/plugins/otel.client', mode: 'client' },
+  ],
 
   modules: [
     '@nuxt/eslint',
