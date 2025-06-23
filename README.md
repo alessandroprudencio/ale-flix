@@ -4,6 +4,10 @@
 
 AleFlix is a modern movie streaming platform that offers a complete catalog of movies, trailers, and content streaming. The application is built with modern technologies and follows the best development practices.
 
+## Preview do App
+
+![Preview do App](./docs/assets/app.png)
+
 ## Features
 
 - Complete movie catalog
@@ -51,6 +55,12 @@ aleflix/
 ## Diagramas Visuais
 
 - [Diagrama Arquitetural (Miro)](https://drive.google.com/file/d/1n1EI1ALYbC7QeQhSTsSwan5wOXlSah0r/view?usp=sharing)
+
+## Observabilidade - Exemplo no Jaeger
+
+Veja abaixo um exemplo de trace capturado no Jaeger:
+
+![Exemplo Jaeger](./docs/assets/jaeger-trace.png)
 
 ## Requisitos
 
