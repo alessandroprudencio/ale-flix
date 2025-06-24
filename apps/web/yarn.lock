@@ -1413,6 +1413,15 @@
     "@opentelemetry/sdk-trace-web" "2.0.1"
     "@opentelemetry/semantic-conventions" "^1.29.0"
 
+"@opentelemetry/instrumentation-user-interaction@^0.47.0":
+  version "0.47.0"
+  resolved "https://registry.yarnpkg.com/@opentelemetry/instrumentation-user-interaction/-/instrumentation-user-interaction-0.47.0.tgz#45826a8aa608bc3ef847456e43222ef3c54d5b00"
+  integrity sha512-IpycEgIr/ZH55rlgC6429+8ze5AE3OhqWGGNSuW0XddiO/jSXUhLCadNQYP2LS7ouS2bgOwr1gEF0FtQtaIe9w==
+  dependencies:
+    "@opentelemetry/core" "^2.0.0"
+    "@opentelemetry/instrumentation" "^0.202.0"
+    "@opentelemetry/sdk-trace-web" "^2.0.0"
+
 "@opentelemetry/instrumentation-xml-http-request@^0.202.0":
   version "0.202.0"
   resolved "https://registry.npmjs.org/@opentelemetry/instrumentation-xml-http-request/-/instrumentation-xml-http-request-0.202.0.tgz"
@@ -1453,7 +1462,7 @@
     "@opentelemetry/sdk-trace-base" "2.0.1"
     protobufjs "^7.3.0"
 
-"@opentelemetry/resources@2.0.1":
+"@opentelemetry/resources@2.0.1", "@opentelemetry/resources@^2.0.1":
   version "2.0.1"
   resolved "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.0.1.tgz"
   integrity sha512-dZOB3R6zvBwDKnHDTB4X1xtMArB/d324VsbiPkX/Yu0Q8T2xceRthoIVFhJdvgVM2QhGVUyX9tzwiNxGtoBJUw==
