@@ -10,17 +10,15 @@ const traceExporter = new OTLPTraceExporter({
 const otelSDK = new NodeSDK({
   serviceName: 'aleflix-transcoder',
   traceExporter,
-  instrumentations: [
-    new HttpInstrumentation(),
-    new PrismaInstrumentation({ middleware: true }),
-  ],
+  instrumentations: [new HttpInstrumentation(), new PrismaInstrumentation({ middleware: true })],
 })
 
 otelSDK.start()
 
 process.on('SIGTERM', () => {
-  otelSDK.shutdown()
+  otelSDK
+    .shutdown()
     .then(() => console.log('[OTEL] Encerrado com sucesso'))
-    .catch((err) => console.error('[OTEL] Erro ao encerrar', err))
+    .catch(err => console.error('[OTEL] Erro ao encerrar', err))
     .finally(() => process.exit(0))
 })
