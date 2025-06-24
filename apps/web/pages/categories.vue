@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-white mb-8">Categorias</h1>
+    <h1 class="text-3xl font-bold text-white mb-8">{{ $t('categories') }}</h1>
 
     <div v-if="loading" class="flex justify-center items-center h-64">
       <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
@@ -24,8 +24,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import api from '~/services/api'
 
+const { t } = useI18n()
 const categories = ref([])
 const loading = ref(true)
 const error = ref(null)
@@ -37,7 +39,7 @@ onMounted(async () => {
     categories.value = response
   } catch (err) {
     console.error('Error loading categories:', err)
-    error.value = 'Error loading categories. Please try again later.'
+    error.value = t('errorLoadingCategories')
   } finally {
     loading.value = false
   }

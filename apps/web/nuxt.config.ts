@@ -8,9 +8,7 @@ export default defineNuxtConfig({
       apiBase: process.env.API_BASE_URL || 'http://localhost:4000',
     },
   },
-  plugins: [
-    { src: '~/plugins/otel.client', mode: 'client' },
-  ],
+  plugins: [{ src: '~/plugins/otel.client', mode: 'client' }],
 
   modules: [
     '@nuxt/eslint',
@@ -20,8 +18,25 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxt/ui',
     '@nuxtjs/tailwindcss',
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    '@nuxtjs/i18n',
   ],
+
+  i18n: {
+    locales: [
+      { code: 'pt', name: 'Português', file: 'pt.json' },
+      { code: 'en', name: 'English', file: 'en.json' },
+    ],
+    defaultLocale: 'pt',
+    lazy: true,
+    langDir: 'locales/',
+    strategy: 'prefix_except_default',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root',
+    },
+  },
 
   nitro: {
     devProxy: {
@@ -32,7 +47,7 @@ export default defineNuxtConfig({
       '/media': {
         target: 'http://localhost:4000',
         changeOrigin: true,
-      }
+      },
     },
   },
 

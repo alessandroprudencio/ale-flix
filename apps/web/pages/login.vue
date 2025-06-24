@@ -1,20 +1,20 @@
 <template>
   <div class="min-h-screen flex">
-    <LeftSection subtitle="Sua plataforma de streaming favorita" />
+    <LeftSection :subtitle="$t('yourFavoriteStreaming')" />
 
-    <RightSection title="Bem-vindo de volta!" subtitle="Entre na sua conta para continuar assistindo">
+    <RightSection :title="$t('welcomeBack')" :subtitle="$t('loginToContinue')">
       <form class="space-y-5" @submit.prevent="handleLogin">
 
         <AlertError v-if="errorMessage" :title="errorMessage" :description="errorDetails" />
 
         <div>
-          <label for="email" class="block mb-1 text-gray-300">Email</label>
-          <input id="email" v-model="loginData.email" type="email" placeholder="seu@email.com" required
+          <label for="email" class="block mb-1 text-gray-300">{{ $t('email') }}</label>
+          <input id="email" v-model="loginData.email" type="email" :placeholder="$t('emailPlaceholder')" required
             class="w-full rounded bg-[#161b22] px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-600">
         </div>
 
         <div>
-          <label for="password" class="block mb-1 text-gray-300">Senha</label>
+          <label for="password" class="block mb-1 text-gray-300">{{ $t('password') }}</label>
           <div class="relative">
             <input id="password" v-model="loginData.password" :type="loginData.showPassword ? 'text' : 'password'" placeholder="••••••••" required
               class="w-full rounded bg-[#161b22] px-4 py-3 pr-10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-600">
@@ -36,16 +36,16 @@
         <div class="flex items-center justify-between text-sm">
           <label class="flex items-center gap-2 cursor-pointer">
             <input v-model="loginData.rememberMe" type="checkbox" class="rounded text-indigo-600 focus:ring-indigo-500">
-            Lembrar de mim
+            {{ $t('rememberMe') }}
           </label>
-          <a href="#" class="text-indigo-500 hover:underline">Esqueceu a senha?</a>
+          <a href="#" class="text-indigo-500 hover:underline">{{ $t('forgotPassword') }}</a>
         </div>
 
-        <Button :full-width="true" variant="primary">Entrar</Button>
+        <Button :full-width="true" variant="primary">{{ $t('login') }}</Button>
       </form>
 
       <div class="my-6 flex items-center before:flex-1 before:border-t before:border-gray-600 after:flex-1 after:border-t after:border-gray-600">
-        <span class="mx-4 text-gray-400">ou continue com</span>
+        <span class="mx-4 text-gray-400">{{ $t('orContinueWith') }}</span>
       </div>
 
       <div class="flex gap-4">
@@ -69,8 +69,8 @@
       </div>
 
       <p class="mt-8 text-center text-gray-400">
-        Não tem uma conta?
-        <NuxtLink href="/signup" class="text-indigo-500 hover:underline">Cadastre-se</NuxtLink>
+        {{ $t('dontHaveAccount') }}
+        <NuxtLink href="/signup" class="text-indigo-500 hover:underline">{{ $t('signupHere') }}</NuxtLink>
       </p>
     </RightSection>
   </div>
@@ -78,18 +78,22 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import LeftSection from '~/components/auth/left-aside.vue'
 import RightSection from '~/components/auth/right-aside.vue'
 import Button from '~/components/ui/button.vue'
 import AlertError from '~/components/ui/alert-error.vue'
 
+const { t } = useI18n()
 const { login } = useAuthStore();
 
 const errorMessage = ref('');
 const errorDetails = ref('');
 const loginData = ref({
-  email: 'admin@example.com',
-  password: '93+~N5!a',
+  email: '',
+  password: '',
+  showPassword: false,
+  rememberMe: false
 })
 
 definePageMeta({
@@ -103,8 +107,8 @@ async function handleLogin() {
     navigateTo('/');
   } catch (err) {
     if (err.data) {
-      errorMessage.value = err.data?.error || 'Erro ao fazer login.'
-      errorDetails.value = err.data?.message || 'Erro ao fazer login.'
+      errorMessage.value = err.data?.error || t('errorOnLogin')
+      errorDetails.value = err.data?.message || t('errorOnLogin')
       return
     }
 
@@ -113,6 +117,6 @@ async function handleLogin() {
 }
 
 function loginWith(provider) {
-  alert(`Login com ${provider} não implementado ainda.`)
+  alert(t('loginWithProvider', { provider }))
 }
 </script>

@@ -5,7 +5,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
-        Voltar
+        {{ $t('back') }}
       </button>
       <div v-if="media" class="bg-gray-900 rounded-lg shadow-lg p-6 flex flex-col md:flex-row gap-8">
         <img :src="media.poster" :alt="media.title" class="w-94 h-96 object-cover rounded-lg mx-auto md:mx-0" />
@@ -25,11 +25,11 @@
           </div>
           <button @click="goToPlayer"
             class="mt-4 bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors w-full md:w-auto cursor-pointer">
-            Assistir
+            {{ $t('player') }}
           </button>
         </div>
       </div>
-      <div v-else class="text-gray-300 text-center">Carregando...</div>
+      <div v-else class="text-gray-300 text-center">{{ $t('loading') }}</div>
     </div>
   </div>
 </template>
@@ -37,8 +37,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import api from '~/services/api'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const media = ref<any>(null)

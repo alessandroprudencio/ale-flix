@@ -26,11 +26,11 @@
               <div class="flex gap-2">
                 <button class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors cursor-pointer"
                   @click="goToPlayer(media.id)">
-                  Assistir
+                  {{ $t('player') }}
                 </button>
                 <button class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors cursor-pointer"
                   @click="goToDetails(media.id)">
-                  Mais informações
+                  {{ $t('moreInfo') }}
                 </button>
               </div>
             </div>
@@ -45,9 +45,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import api from '~/services/api'
 // import VideoPlayer from '~/components/ui/video-player.vue'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const categoria = ref(null)
@@ -84,7 +86,7 @@ onMounted(async () => {
     const media = await api.getMediaByCategory(route.params.id)
     mediaList.value = media
   } catch (err) {
-    error.value = 'Erro ao carregar categoria ou mídias.'
+    error.value = t('errorLoadingCategoryOrMedia')
   } finally {
     loading.value = false
   }
