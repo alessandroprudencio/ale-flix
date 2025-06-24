@@ -1,4 +1,8 @@
-# AleFlix (Watch Brasil Challenge)
+# AleFlix
+
+## Preview do App
+
+![Preview do App](./docs/assets/app.png)
 
 ## Sobre
 
@@ -27,7 +31,7 @@ AleFlix é uma plataforma de streaming de vídeos com catálogo, upload, transco
 ## Estrutura do Projeto
 
 ```
-watch-brasil-challenge/
+ale-flix/
 ├── apps/
 │   ├── api/                # Backend NestJS
 │   ├── web/                # Frontend Nuxt 3 (Vue.js)
