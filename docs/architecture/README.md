@@ -1,6 +1,6 @@
 # Arquitetura do AleFlix
 
-> [Diagrama Arquitetural no Miro](https://drive.google.com/file/d/1n1EI1ALYbC7QeQhSTsSwan5wOXlSah0r/view?usp=sharing)
+> [Diagrama Arquitetural no Draw.io](https://drive.google.com/file/d/1n1EI1ALYbC7QeQhSTsSwan5wOXlSah0r/view?usp=sharing)
 
 ## Visão Geral
 
