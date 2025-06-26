@@ -61,6 +61,7 @@ services:
     container_name: ale-flix-api
     ports:
       - '4000:4000'
+      - '9464:9464'
     volumes:
       - ./apps/api:/app
     depends_on:
@@ -141,6 +142,33 @@ services:
       - ale-flix-network
     depends_on:
       - ale-flix-jaeger
+
+  ale-flix-prometheus:
+    image: prom/prometheus:latest
+    container_name: ale-flix-prometheus
+    depends_on:
+      - ale-flix-jaeger
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - '9090:9090'
+    networks:
+      - ale-flix-network
+
+  ale-flix-grafana:
+    image: grafana/grafana:latest
+    container_name: ale-flix-grafana
+    depends_on:
+      - ale-flix-prometheus
+    ports:
+      - '3004:3000'
+    volumes:
+      - ./grafana-storage:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    # restart: unless-stopped
+    networks:
+      - ale-flix-network
 
 networks:
   ale-flix-network:

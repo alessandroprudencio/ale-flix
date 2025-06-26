@@ -144,3 +144,19 @@ AWS_SECRET_ACCESS_KEY="fakeSecretAccessKey"
 ## Licença
 
 MIT
+
+## Diagrama do Fluxo de Logs e Observabilidade
+
+O diagrama abaixo mostra como os logs, traces e métricas fluem pela aplicação AleFlix, desde a requisição do usuário até os sistemas de observabilidade e logs.
+
+```mermaid
+flowchart TD
+  A[Usuário faz requisição] --> B[Nuxt 3 (web)]
+  B --> C[NestJS API]
+  C --> D[OpenTelemetry SDK]
+  C --> E[Logger NestJS / Console]
+  D -- Traces --> F[Jaeger]
+  D -- Métricas --> G[Prometheus]
+  E -- stdout/stderr --> H[Docker Logs / Cloud Logs]
+  C -- Erros HTTP --> B
+```
