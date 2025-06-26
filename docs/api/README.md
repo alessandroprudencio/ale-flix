@@ -4,6 +4,8 @@
 
 A API do AleFlix é construída com NestJS e Fastify, seguindo os princípios RESTful e utilizando OpenAPI para documentação.
 
+**URL Base:** `http://localhost:4000`
+
 ## Autenticação
 
 A autenticação é feita via cookies HTTP-only. O token JWT é automaticamente enviado em cada requisição através do cookie `auth_token`.
@@ -12,12 +14,17 @@ A autenticação é feita via cookies HTTP-only. O token JWT é automaticamente 
 
 Ao fazer login, o servidor retorna um cookie HTTP-only com o token JWT. Este cookie é automaticamente enviado em todas as requisições subsequentes.
 
+### Funcionalidade "Lembrar de mim"
+
+- **Quando marcado**: Token expira em 30 dias
+- **Quando desmarcado**: Token expira em 1 dia
+
 ### Segurança
 
 - Cookies são HTTP-only (não acessíveis via JavaScript)
 - Cookies são seguros em produção (HTTPS apenas)
-- Cookies são configurados com SameSite=Lax para proteção contra CSRF
-- Tokens têm expiração de 24 horas
+- Cookies são configurados com SameSite=None para proteção contra CSRF
+- Tokens têm expiração configurável baseada na opção "Lembrar de mim"
 
 ## Endpoints
 
@@ -38,6 +45,9 @@ requestBody:
           password:
             type: string
             minLength: 6
+          rememberMe:
+            type: boolean
+            description: 'Se true, token expira em 30 dias. Se false, expira em 1 dia.'
 responses:
   200:
     content:
@@ -45,13 +55,15 @@ responses:
         schema:
           type: object
           properties:
+            accessToken:
+              type: string
             user:
-              $ref: "#/components/schemas/User"
+              $ref: '#/components/schemas/User'
     headers:
       Set-Cookie:
         schema:
           type: string
-          example: auth_token=xxx; HttpOnly; Path=/; Max-Age=86400; SameSite=Lax
+          example: auth_token=xxx; HttpOnly; Path=/; Max-Age=2592000; SameSite=None; Secure
 ```
 
 #### POST /auth/signup
@@ -76,12 +88,29 @@ responses:
     content:
       application/json:
         schema:
-          $ref: "#/components/schemas/User"
+          type: object
+          properties:
+            message:
+              type: string
+            user:
+              $ref: '#/components/schemas/User'
 ```
 
-### Usuários
+#### POST /auth/logout
 
-#### GET /users/me
+```yaml
+responses:
+  200:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+```
+
+#### GET /auth/me
 
 ```yaml
 security:
@@ -91,7 +120,7 @@ responses:
     content:
       application/json:
         schema:
-          $ref: "#/components/schemas/User"
+          $ref: '#/components/schemas/User'
 ```
 
 ### Mídia
@@ -110,6 +139,11 @@ parameters:
     schema:
       type: integer
       default: 10
+  - name: type
+    in: query
+    schema:
+      type: string
+      enum: [MOVIE, SERIES, DOCUMENTARY]
 responses:
   200:
     content:
@@ -120,7 +154,7 @@ responses:
             items:
               type: array
               items:
-                $ref: "#/components/schemas/Media"
+                $ref: '#/components/schemas/Media'
             total:
               type: integer
             page:
@@ -143,12 +177,69 @@ responses:
     content:
       application/json:
         schema:
-          $ref: "#/components/schemas/Media"
+          $ref: '#/components/schemas/Media'
 ```
 
-### Streaming
+#### POST /media
 
-#### GET /media/{id}/stream
+```yaml
+requestBody:
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        properties:
+          title:
+            type: string
+          description:
+            type: string
+          releaseYear:
+            type: integer
+          type:
+            type: string
+            enum: [MOVIE, SERIES, DOCUMENTARY]
+          rating:
+            type: string
+            enum: [G, PG, PG13, R, NC17]
+          duration:
+            type: integer
+          poster:
+            type: string
+            format: binary
+          video:
+            type: string
+            format: binary
+responses:
+  201:
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/Media'
+```
+
+#### PUT /media/{id}
+
+```yaml
+parameters:
+  - name: id
+    in: path
+    required: true
+    schema:
+      type: string
+requestBody:
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/UpdateMediaDto'
+responses:
+  200:
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/Media'
+```
+
+#### DELETE /media/{id}
 
 ```yaml
 parameters:
@@ -164,11 +255,59 @@ responses:
         schema:
           type: object
           properties:
-            url:
+            message:
               type: string
-            expiresAt:
-              type: string
-              format: date-time
+```
+
+### Categorias
+
+#### GET /media/categories
+
+```yaml
+responses:
+  200:
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+```
+
+#### GET /media/categories/{id}
+
+```yaml
+parameters:
+  - name: id
+    in: path
+    required: true
+    schema:
+      type: string
+responses:
+  200:
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/Category'
+```
+
+#### GET /media/categories/{id}/media
+
+```yaml
+parameters:
+  - name: id
+    in: path
+    required: true
+    schema:
+      type: string
+responses:
+  200:
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
 ```
 
 ## Schemas
@@ -180,7 +319,7 @@ type: object
 properties:
   id:
     type: string
-    format: uuid
+    format: cuid
   email:
     type: string
     format: email
@@ -188,7 +327,7 @@ properties:
     type: string
   role:
     type: string
-    enum: [USER, PRODUCER, ADMIN]
+    enum: [USER, ADMIN]
   createdAt:
     type: string
     format: date-time
@@ -204,18 +343,81 @@ type: object
 properties:
   id:
     type: string
-    format: uuid
+    format: cuid
   title:
     type: string
   description:
     type: string
-  duration:
-    type: integer
+    nullable: true
   thumbnailUrl:
     type: string
+  releaseYear:
+    type: integer
+  type:
+    type: string
+    enum: [MOVIE, SERIES, DOCUMENTARY]
+  rating:
+    type: string
+    enum: [G, PG, PG13, R, NC17]
+  duration:
+    type: integer
+  progress:
+    type: integer
+    nullable: true
+  isFeatured:
+    type: boolean
+    default: false
+  isPopular:
+    type: boolean
+    default: false
+  releaseDate:
+    type: string
+    format: date-time
+    nullable: true
+  createdAt:
+    type: string
+    format: date-time
+  updatedAt:
+    type: string
+    format: date-time
+  userRating:
+    type: number
+    format: float
+    default: 0
+  viewCount:
+    type: integer
+    default: 0
+  userId:
+    type: string
+  poster:
+    type: string
+  streamUrl:
+    type: string
+    nullable: true
   status:
     type: string
-    enum: [PROCESSING, READY, ERROR]
+    enum: [DRAFT, PUBLISHED, ARCHIVED, PROCESSING, READY, ERROR]
+    default: DRAFT
+  categories:
+    type: array
+    items:
+      $ref: '#/components/schemas/Category'
+```
+
+### Category
+
+```yaml
+type: object
+properties:
+  id:
+    type: string
+    format: cuid
+  name:
+    type: string
+    unique: true
+  description:
+    type: string
+    nullable: true
   createdAt:
     type: string
     format: date-time
@@ -226,62 +428,60 @@ properties:
 
 ## Códigos de Erro
 
-| Código | Descrição                                 |
-| ------ | ----------------------------------------- |
-| 400    | Bad Request - Dados inválidos             |
-| 401    | Unauthorized - Token inválido ou expirado |
-| 403    | Forbidden - Sem permissão                 |
-| 404    | Not Found - Recurso não encontrado        |
-| 429    | Too Many Requests - Rate limit excedido   |
-| 500    | Internal Server Error - Erro interno      |
+### 400 - Bad Request
 
-## Rate Limiting
+- Dados de entrada inválidos
+- Validação falhou
 
-A API implementa rate limiting para proteger contra abusos:
+### 401 - Unauthorized
 
-- 100 requisições por minuto por IP
-- 1000 requisições por hora por usuário autenticado
+- Token JWT inválido ou expirado
+- Credenciais inválidas
 
-## WebSocket
+### 403 - Forbidden
 
-### Eventos
+- Usuário não tem permissão para acessar o recurso
 
-```typescript
-// Conexão
-//api.aleflix.com/ws
+### 404 - Not Found
 
-// Eventos disponíveis
-ws: interface Events {
-  "media:status": {
-    mediaId: string;
-    status: "PROCESSING" | "READY" | "ERROR";
-  };
-  "user:notification": {
-    type: string;
-    message: string;
-  };
-}
-```
+- Recurso não encontrado
+
+### 500 - Internal Server Error
+
+- Erro interno do servidor
 
 ## Exemplos de Uso
 
-### Autenticação
+### Login com "Lembrar de mim"
 
 ```bash
-# Login
-curl -X POST http://api.aleflix.com/auth/login \
+curl -X POST http://localhost:4000/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "password": "password123"}'
-
-# Usar token
-curl http://api.aleflix.com/users/me \
-  -H "Authorization: Bearer <token>"
+  -d '{
+    "email": "user@example.com",
+    "password": "password123",
+    "rememberMe": true
+  }'
 ```
 
-### Streaming
+### Upload de mídia
 
 ```bash
-# Obter URL de streaming
-curl http://api.aleflix.com/media/123/stream \
-  -H "Authorization: Bearer <token>"
+curl -X POST http://localhost:4000/media \
+  -H "Cookie: auth_token=your-jwt-token" \
+  -F "title=Meu Filme" \
+  -F "description=Descrição do filme" \
+  -F "releaseYear=2024" \
+  -F "type=MOVIE" \
+  -F "rating=PG13" \
+  -F "duration=120" \
+  -F "poster=@poster.jpg" \
+  -F "video=@video.mp4"
+```
+
+### Buscar mídia por categoria
+
+```bash
+curl -X GET http://localhost:4000/media/categories/123/media \
+  -H "Cookie: auth_token=your-jwt-token"
 ```

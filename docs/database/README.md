@@ -2,59 +2,61 @@
 
 ## Visão Geral
 
-O AleFlix utiliza PostgreSQL como banco de dados principal, com suporte a migrações e versionamento de schema.
+O AleFlix utiliza PostgreSQL como banco de dados principal, com Prisma como ORM e suporte a migrações e versionamento de schema.
 
 ## Diagrama ERD
 
 ```mermaid
 erDiagram
     users {
-        uuid id PK
-        string email
+        string id PK "cuid"
+        string email "unique"
         string password
         string name
-        enum role
+        enum role "USER, ADMIN"
         timestamp created_at
         timestamp updated_at
     }
 
     media {
-        uuid id PK
+        string id PK "cuid"
         string title
         text description
-        integer duration
         string thumbnail_url
-        enum status
-        uuid user_id FK
+        integer release_year
+        enum type "MOVIE, SERIES, DOCUMENTARY"
+        enum rating "G, PG, PG13, R, NC17"
+        integer duration
+        integer progress
+        boolean is_featured
+        boolean is_popular
+        timestamp release_date
         timestamp created_at
         timestamp updated_at
+        float user_rating
+        integer view_count
+        string user_id FK
+        string poster
+        string stream_url
+        enum status "DRAFT, PUBLISHED, ARCHIVED, PROCESSING, READY, ERROR"
     }
 
     categories {
-        uuid id PK
-        string name
-        string slug
+        string id PK "cuid"
+        string name "unique"
+        text description
         timestamp created_at
         timestamp updated_at
     }
 
     media_categories {
-        uuid media_id FK
-        uuid category_id FK
-    }
-
-    views {
-        uuid id PK
-        uuid user_id FK
-        uuid media_id FK
-        integer progress
+        string id PK "cuid"
+        string media_id FK
+        string category_id FK
         timestamp created_at
-        timestamp updated_at
     }
 
     users ||--o{ media : creates
-    users ||--o{ views : watches
-    media ||--o{ views : has
     media }o--|| media_categories : has
     categories }o--|| media_categories : has
 ```
@@ -65,7 +67,7 @@ erDiagram
 
 ```sql
 CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
@@ -79,15 +81,26 @@ CREATE TABLE users (
 
 ```sql
 CREATE TABLE media (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    duration INTEGER,
-    thumbnail_url VARCHAR(255),
-    status VARCHAR(20) NOT NULL DEFAULT 'PROCESSING',
-    user_id UUID REFERENCES users(id),
+    thumbnail_url VARCHAR(255) NOT NULL,
+    release_year INTEGER NOT NULL,
+    type VARCHAR(20) NOT NULL,
+    rating VARCHAR(10) NOT NULL,
+    duration INTEGER NOT NULL,
+    progress INTEGER,
+    is_featured BOOLEAN NOT NULL DEFAULT false,
+    is_popular BOOLEAN NOT NULL DEFAULT false,
+    release_date TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    user_rating DECIMAL(3,2) DEFAULT 0,
+    view_count INTEGER NOT NULL DEFAULT 0,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    poster VARCHAR(255) NOT NULL,
+    stream_url VARCHAR(255),
+    status VARCHAR(20) NOT NULL DEFAULT 'DRAFT'
 );
 ```
 
@@ -95,9 +108,9 @@ CREATE TABLE media (
 
 ```sql
 CREATE TABLE categories (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(255) NOT NULL,
-    slug VARCHAR(255) UNIQUE NOT NULL,
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) UNIQUE NOT NULL,
+    description TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -106,24 +119,39 @@ CREATE TABLE categories (
 ### Media Categories
 
 ```sql
-CREATE TABLE media_categories (
-    media_id UUID REFERENCES media(id) ON DELETE CASCADE,
-    category_id UUID REFERENCES categories(id) ON DELETE CASCADE,
-    PRIMARY KEY (media_id, category_id)
+CREATE TABLE media_to_category (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+    media_id TEXT NOT NULL REFERENCES media(id) ON DELETE CASCADE,
+    category_id TEXT NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(media_id, category_id)
 );
 ```
 
-### Views
+## Enums
+
+### MediaType
 
 ```sql
-CREATE TABLE views (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    media_id UUID REFERENCES media(id) ON DELETE CASCADE,
-    progress INTEGER DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+CREATE TYPE media_type AS ENUM ('MOVIE', 'SERIES', 'DOCUMENTARY');
+```
+
+### MediaStatus
+
+```sql
+CREATE TYPE media_status AS ENUM ('DRAFT', 'PUBLISHED', 'ARCHIVED', 'PROCESSING', 'READY', 'ERROR');
+```
+
+### MediaRating
+
+```sql
+CREATE TYPE media_rating AS ENUM ('G', 'PG', 'PG13', 'R', 'NC17');
+```
+
+### UserRole
+
+```sql
+CREATE TYPE user_role AS ENUM ('USER', 'ADMIN');
 ```
 
 ## Índices
@@ -135,52 +163,79 @@ CREATE INDEX idx_users_role ON users(role);
 
 -- Media
 CREATE INDEX idx_media_user_id ON media(user_id);
+CREATE INDEX idx_media_type ON media(type);
+CREATE INDEX idx_media_release_year ON media(release_year);
+CREATE INDEX idx_media_is_featured ON media(is_featured);
+CREATE INDEX idx_media_is_popular ON media(is_popular);
+CREATE INDEX idx_media_release_date ON media(release_date);
 CREATE INDEX idx_media_status ON media(status);
-CREATE INDEX idx_media_created_at ON media(created_at);
 
 -- Categories
-CREATE INDEX idx_categories_slug ON categories(slug);
+CREATE INDEX idx_categories_name ON categories(name);
 
--- Views
-CREATE INDEX idx_views_user_id ON views(user_id);
-CREATE INDEX idx_views_media_id ON views(media_id);
-CREATE INDEX idx_views_created_at ON views(created_at);
+-- Media Categories
+CREATE INDEX idx_media_categories_media_id ON media_to_category(media_id);
+CREATE INDEX idx_media_categories_category_id ON media_to_category(category_id);
 ```
 
 ## Migrações
 
-O projeto utiliza TypeORM para gerenciamento de migrações. As migrações são versionadas e podem ser encontradas em:
+O projeto utiliza Prisma para gerenciamento de migrações. As migrações são versionadas e podem ser encontradas em:
 
 ```
-apps/api/src/database/migrations/
+apps/api/prisma/migrations/
 ```
 
 ### Comandos de Migração
 
 ```bash
 # Criar nova migração
-npm run migration:create -- -n NomeDaMigracao
+npx prisma migrate dev --name NomeDaMigracao
 
 # Executar migrações pendentes
-npm run migration:run
+npx prisma migrate deploy
 
-# Reverter última migração
-npm run migration:revert
+# Resetar banco de dados
+npx prisma migrate reset
+
+# Gerar cliente Prisma
+npx prisma generate
 ```
+
+### Migrações Existentes
+
+1. **20250616211245_init** - Criação inicial das tabelas
+2. **20250617214757_add_media_and_categories** - Adição de mídia e categorias
+3. **20250618123444_update_media_category_to_uuid** - Atualização para UUID
+4. **20250618160532_change_rating_to_enum** - Mudança de rating para enum
+5. **20250618211822_add_status_and_stream_url_to_media** - Adição de status e stream URL
+
+## Seed Data
+
+O projeto inclui dados de exemplo para testes:
+
+```bash
+# Executar seed
+npx prisma db seed
+```
+
+### Dados de Exemplo
+
+- **Usuários**: Admin e usuários de teste
+- **Categorias**: Ação, Comédia, Drama, Documentário, etc.
+- **Mídia**: Filmes e documentários de exemplo
 
 ## Cache
 
-O sistema utiliza Redis (ElastiCache) para cache em diferentes níveis:
+O sistema utiliza Redis para cache em diferentes níveis:
 
 1. **Cache de Consultas**
-
    - Resultados de queries frequentes
    - TTL: 5 minutos
 
 2. **Cache de Sessão**
-
    - Tokens JWT
-   - TTL: 24 horas
+   - TTL: 1 dia (ou 30 dias com "Lembrar de mim")
 
 3. **Cache de Mídia**
    - Metadados de vídeos
@@ -199,12 +254,15 @@ export class MediaCacheService {
     const cached = await this.cacheManager.get(cacheKey)
 
     if (cached) {
-      return cached
+      return cached as Media
     }
 
-    const media = await this.mediaRepository.findOne(id)
-    await this.cacheManager.set(cacheKey, media, 3600) // 1 hora
+    const media = await this.prisma.media.findUnique({
+      where: { id },
+      include: { categories: true },
+    })
 
+    await this.cacheManager.set(cacheKey, media, 3600) // 1 hora
     return media
   }
 }
@@ -214,33 +272,33 @@ export class MediaCacheService {
 
 ### Backup Automático
 
-- Backup diário completo
-- Backup incremental a cada 6 horas
-- Retenção de 30 dias
-
-### Recuperação
-
 ```bash
-# Restaurar backup
-pg_restore -d aleflix backup.dump
+# Backup do banco
+pg_dump -h localhost -U postgres -d ale-flix > backup.sql
 
-# Verificar integridade
-pg_verify_checksums -d aleflix
+# Restaurar backup
+psql -h localhost -U postgres -d ale-flix < backup.sql
 ```
+
+### Estratégia de Backup
+
+- **Backup diário**: 00:00 UTC
+- **Retenção**: 30 dias
+- **Backup incremental**: A cada 6 horas
+- **Teste de recuperação**: Semanal
 
 ## Monitoramento
 
-### Métricas
+### Métricas Importantes
 
-- QPS (Queries Per Second)
-- Latência
-- Uso de conexões
-- Tamanho do banco
-- Cache hit ratio
+- **Tempo de resposta das queries**: < 100ms
+- **Taxa de cache hit**: > 80%
+- **Uso de conexões**: < 80% do pool
+- **Tamanho do banco**: Monitoramento de crescimento
 
 ### Alertas
 
-- Alta latência (> 100ms)
-- Erros de conexão
-- Espaço em disco < 20%
-- Cache miss ratio > 30%
+- **Tempo de resposta alto**: > 500ms
+- **Taxa de erro**: > 1%
+- **Espaço em disco**: < 20% livre
+- **Conexões ativas**: > 90% do pool
