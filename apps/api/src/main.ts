@@ -8,12 +8,7 @@ import fastifyCookie from '@fastify/cookie'
 import multipart from '@fastify/multipart'
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter({
-      // bodyLimit: 600 * 1024 * 1024, // 600MB
-    }),
-  )
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({}))
 
   await app.register(multipart)
 
@@ -21,10 +16,8 @@ async function bootstrap() {
     .setTitle('AleFlix API')
     .setDescription('API da plataforma de streaming AleFlix')
     .setVersion('1.0')
-    .addTag('auth', 'Endpoints de autenticação')
     .addTag('users', 'Endpoints de usuários')
     .addTag('media', 'Endpoints de mídia')
-    .addTag('streaming', 'Endpoints de streaming')
     .addBearerAuth()
     .build()
 
