@@ -8,7 +8,7 @@
       <nav class="mt-5 px-2">
         <NuxtLink to="/admin/media"
           class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-          :class="{ 'bg-gray-700 text-white': $route.path.startsWith('/admin/media') }">
+          :class="mediaLinkClasses">
           <svg class="mr-3 h-6 w-6 text-gray-400 group-hover:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
@@ -36,7 +36,16 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+const mediaLinkClasses = computed(() => ({
+  'bg-gray-700 text-white': route.path.startsWith('/admin/media')
+}))
+
 definePageMeta({
   layout: 'admin',
   middleware: ['auth']
