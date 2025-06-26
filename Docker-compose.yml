@@ -63,7 +63,6 @@ services:
       - '4000:4000'
     volumes:
       - ./apps/api:/app
-      # - /app/node_modules
     depends_on:
       - ale-flix-db
     networks:

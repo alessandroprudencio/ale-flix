@@ -43,9 +43,9 @@ __tests__
 *.spec.ts
 *.test.ts
 
-# # Prisma
-# prisma/*.db
-# prisma/migrations
+# Prisma
+prisma/*.db
+prisma/migrations
 
 # Misc
 README.md
