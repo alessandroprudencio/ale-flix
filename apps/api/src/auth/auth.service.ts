@@ -84,14 +84,21 @@ export class AuthService {
       role: user.role,
     }
 
-    const accessToken = await this.jwtService.signAsync(payload)
+    // Define a duração do token baseado no "Lembrar de mim"
+    const tokenExpiration = dto.rememberMe
+      ? 1000 * 60 * 60 * 24 * 30 // 30 dias
+      : 1000 * 60 * 60 * 24 // 1 dia
+
+    const accessToken = await this.jwtService.signAsync(payload, {
+      expiresIn: dto.rememberMe ? '30d' : '1d',
+    })
 
     res.setCookie('auth_token', accessToken, {
       httpOnly: true,
       path: '/',
       secure: true,
       sameSite: 'None',
-      maxAge: 1000 * 60 * 60 * 24, // 1 dia
+      maxAge: tokenExpiration,
       // domain: process.env.COOKIE_DOMAIN || undefined,
     })
 

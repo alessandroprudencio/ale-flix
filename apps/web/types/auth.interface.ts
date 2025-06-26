@@ -20,6 +20,7 @@ export interface BodySignup {
 export interface BodyLogin {
   email: string
   password: string
+  rememberMe?: boolean
 }
 
 export interface AuthState {
