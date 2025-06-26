@@ -111,8 +111,23 @@ async function handleLogin() {
       errorDetails.value = err.data?.message || t('errorOnLogin')
       return
     }
+    if (
+      err?.status === 0 ||
+      err?.message?.includes('fetch') ||
+      err?.message?.includes('NetworkError') ||
+      err?.message?.includes('Failed to fetch') ||
+      err?.message?.includes('Network request failed')
+    ) {
+      errorMessage.value = t('errorApiOffline') || 'API fora do ar. Tente novamente mais tarde.';
+      errorDetails.value = '';
+      return;
+    }
 
-    console.log(err);
+    errorMessage.value = t('errorOnLogin');
+    errorDetails.value = err?.message || '';
+
+    console.log(err.status);
+    console.log(err.message);
   }
 }
 

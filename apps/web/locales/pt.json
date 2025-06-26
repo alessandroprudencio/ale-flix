@@ -57,5 +57,6 @@
   "forgotPassword": "Esqueceu a senha?",
   "orContinueWith": "ou continue com",
   "errorOnLogin": "Erro ao fazer login.",
-  "loginWithProvider": "Login com {provider} não implementado ainda."
+  "loginWithProvider": "Login com {provider} não implementado ainda.",
+  "errorApiOffline": "API fora do ar. Tente novamente mais tarde."
 }
